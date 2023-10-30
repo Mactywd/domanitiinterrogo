@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<title>Something</title>
+
+		<style>
+			body {
+				margin: 0;
+				padding: 0;
+				background-color: #f1f1f1;
+			}
+
+			nav {
+				background-color: #fff;
+				height: 60px;
+				display: flex;
+				justify-content: flex-start;
+				align-items: center;
+			}
+            nav a {
+                text-decoration: none;
+                color: #4EA5D1;
+                font-weight: bold;
+                font-size: 20px;
+                margin-left: 20px;
+            }
+
+			img {
+				height: 40px;
+				margin-left: 20px;
+			}
+
+			main {
+				display: grid;
+				grid-template-columns: 1fr;
+				grid-gap: 20px;
+				padding: 20px;
+				margin: 10px 40px;
+			}
+            main a {
+                text-decoration: none;
+                color: black;
+            }
+			.materia {
+				background-color: #fff;
+				border-radius: 5px;
+				padding: 20px;
+				box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
+				text-align: center;
+			}
+            .materia:hover {
+                box-shadow: 0 0 5px rgba(0, 0, 0, 0.3);
+            }
+		</style>
+	</head>
+	<body>
+		<nav>
+			<img src="https://i.imgur.com/GOYwxYO.png" alt="logo" />
+            <!-- <a href="."><img src="https://i.imgur.com/lJKFrz5.png" alt="Interrogazioni"></a> -->
+            <a href=".">Interrogazioni</a>
+        </nav>
+
+		<main>
+			<a href="materia/">
+                
+				<div class="materia">Letteratura Italiana</div>
+			</a>
+			<a href="materia/">
+				<div class="materia">Letteratura Latina</div>
+			</a>
+			<a href="materia/">
+				<div class="materia">Scienze</div>
+			</a>
+			<a href="materia/">
+				<div class="materia">Matematica</div>
+			</a>
+			<a href="materia/">
+				<div class="materia">Storia</div>
+			</a>
+			<a href="materia/">
+				<div class="materia">Filosofia</div>
+			</a>
+			<a href="materia/">
+				<div class="materia">Inglese</div>
+			</a>
+		</main>
+	</body>
+</html>

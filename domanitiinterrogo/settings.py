@@ -25,7 +25,7 @@ SECRET_KEY = 'django-insecure-b$#lwy9qplj5bf5ogb+5st-&w5*nwvbkbl5427f$%rd))r11dm
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['*']
 
 
 # Application definition
@@ -54,7 +54,7 @@ ROOT_URLCONF = 'domanitiinterrogo.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': ['interrogazioni/templates'],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
