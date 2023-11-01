@@ -53,6 +53,9 @@
             .materia:hover {
                 box-shadow: 0 0 5px rgba(0, 0, 0, 0.3);
             }
+            h3 {
+                text-align: center;
+            }
 		</style>
 	</head>
 	<body>
@@ -61,10 +64,10 @@
             <!-- <a href="."><img src="https://i.imgur.com/lJKFrz5.png" alt="Interrogazioni"></a> -->
             <a href=".">Interrogazioni</a>
         </nav>
-
+        <h3>Seleziona una materia da resettare</h1>
 		<main>
 			{% for materia in materie %}
-				<a href="/materia/{{materia.url_name}}"> 
+				<a href="/reset/{{materia.url_name}}"> 
 					<div class="materia">{{materia.name}}</div>
 				</a>
 			{% endfor %}

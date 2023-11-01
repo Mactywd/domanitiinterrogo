@@ -69,7 +69,7 @@
                 display: none;
 				color: black;
 				padding: 0em 5% 1em 5%;
-				position: absolute;
+				position: fixed;
 				width: 80%;
 				margin-left: 5%;
 				margin-top: 20px;
@@ -123,9 +123,9 @@
 				<!-- input for nome and ultima interrogazione without forms -->
 				<div class="input-data">
 					<p>Nome:</p>
-					<input type="text" value="Nome Qua" readonly />
+					<input type="text" class="person-name" value="" readonly />
 					<p>Ultima Interrogazione:</p>
-					<input type="date" />
+					<input type="date" class="new-date" />
 				</div>
 				<div class="buttons">
 					<button id="back-btn">Indietro</button>
@@ -140,90 +140,54 @@
 					<th></th>
 				</thead>
 				<tbody>
+					{% for last in last_interrogations %}
 					<tr>
-						<td>Anniballo</td>
-						<td style="color: red">mai</td>
-						<td><button>Aggiorna</button></td>
+						<td>{{last.person.name}}</td>
+						<td style="color: {{last.color}}">{{last.formatted_date}}</td>
+						<td><button class="update-button">Aggiorna</button></td>
 					</tr>
-					<tr>
-						<td>Armini</td>
-						<td style="color: green">29 ottobre (ieri)</td>
-						<td><button>Aggiorna</button></td>
-					</tr>
-					<tr>
-						<td>Bechi</td>
-						<td style="color: green">10 ottobre (3 settimane fa)</td>
-						<td><button>Aggiorna</button></td>
-					</tr>
-					<tr>
-						<td>Bucci</td>
-						<td style="color: red">mai</td>
-						<td><button>Aggiorna</button></td>
-					</tr>
-					<tr>
-						<td>Canne</td>
-						<td style="color: green">28 settembre (1 mese fa)</td>
-						<td><button>Aggiorna</button></td>
-					</tr>
-					<tr>
-						<td>Caldi</td>
-						<td style="color: red">mai</td>
-						<td><button>Aggiorna</button></td>
-					</tr>
-					<tr>
-						<td>Cauceglia</td>
-						<td style="color: red">mai</td>
-						<td><button>Aggiorna</button></td>
-					</tr>
-					<tr>
-						<td>Cennini</td>
-						<td style="color: red">mai</td>
-						<td><button>Aggiorna</button></td>
-					</tr>
-					<tr>
-						<td>Faggioli</td>
-						<td style="color: green">14 ottobre (2 settimane fa)</td>
-						<td><button>Aggiorna</button></td>
-					</tr>
-					<tr>
-						<td>Fe</td>
-						<td style="color: red">mai</td>
-						<td><button>Aggiorna</button></td>
-					</tr>
-					<tr>
-						<td>Girellini</td>
-						<td style="color: green">27 ottobre (1 settimana fa)</td>
-						<td><button>Aggiorna</button></td>
-					</tr>
-					<tr>
-						<td>Lenti</td>
-						<td style="color: red">mai</td>
-						<td><button>Aggiorna</button></td>
-					</tr>
-					<tr>
-						<td>Lorenzoni</td>
-						<td style="color: red">mai</td>
-						<td><button>Aggiorna</button></td>
-					</tr>
+					{% endfor %}
 				</tbody>
 			</table>
 		</main>
 
+		<!-- import jquery -->
+		<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
 		<script>
-            let buttons = document.querySelectorAll("tbody button");
-            let backBtn = document.querySelector("#back-btn");
-            let updateBtn = document.querySelector("#update-btn");
-			buttons.forEach((button) => {
-				button.addEventListener("click", () => {
-                    document.querySelector(".update").style.display = "block";
+			
+			$(".update-button").on("click", function() {
+					$(".person-name").val($(this)[0].parentNode.parentNode.children[0].innerText)
+					$(".update").show();
+
+					// $(this)[0].parentNode.parentNode.children[0].innerText
                 });
+			
+			$("#back-btn").on("click", () => {
+				$(".update").hide();
 			});
-            backBtn.addEventListener("click", () => {
-                document.querySelector(".update").style.display = "none";
-            });
-            updateBtn.addEventListener("click", () => {
-                document.querySelector(".update").style.display = "none";
-            });
+
+			$("#update-btn").on("click", () => {
+				// ajax request
+				$.ajax({
+					url: "/update/",
+					type: "POST",
+					headers: {
+						'X-CSRFToken': "{{ csrf_token }}",
+					},
+					data: {
+						name: $(".person-name").val(),
+						date: $(".new-date").val(),
+						subject: "{{subject}}",
+					},
+					success: function(response) {
+						location.reload();
+					},
+				});
+
+
+				$(".update").hide();
+			});
 		</script>
 	</body>
 </html>
