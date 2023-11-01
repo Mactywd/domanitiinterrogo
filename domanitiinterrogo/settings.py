@@ -51,7 +51,7 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
 
-CSRF_TRUSTED_ORIGINS = ["https://domanitiinterrogo.online/admin/"]
+CSRF_TRUSTED_ORIGINS = ["https://domanitiinterrogo.online/*"]
 
 ROOT_URLCONF = 'domanitiinterrogo.urls'
 
