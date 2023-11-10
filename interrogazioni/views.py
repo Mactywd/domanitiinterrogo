@@ -1,21 +1,50 @@
 from django.shortcuts import render
 from .models import Persona, Materia, LastInterrogation
 from django.http import HttpResponse, HttpResponseForbidden
-# redirect
 from django.shortcuts import redirect
 import datetime
-
+from firebase_admin import db
+import json
 
 # Create your views here.
 def index(request):
     materie = Materia.objects.all()
     
+    #### TEMPORARY ####
+    # # reset everything
+    # for subject in materie:
+    #     for persona in Persona.objects.all():
+    #         ref = db.reference("/" + subject.name + "/" + persona.name)
+    #         ref.set({"placeholder": 0})
+    
     return render(request, 'interrogazioni/index.html', {'materie': materie})
 
 def materia(request, subject):
-    interrogations = LastInterrogation.objects.filter(subject__url_name=subject)
+    subject = Materia.objects.get(url_name=subject)
+    ref = db.reference("/" + subject.name)
+    interrogated = ref.get()
     
-    return render(request, 'interrogazioni/materia.html', {'last_interrogations': interrogations, 'subject': subject})
+    people = list(interrogated.keys())
+    interrogations = list(interrogated.values())
+    for i in range(len(interrogations)):
+        # interrogations[i] = {"placeholder": 0, "jn77tGGUh--": "2021-10-10"}
+        # remove placeholder
+        interrogations[i].pop("placeholder")
+        
+        
+        
+    interrogated_times = []
+    for interrogation in interrogations:
+        interrogated_times.append(len(interrogation))   
+    
+    context = {
+        'people': people,
+        'interrogations': interrogations,
+        'interrogated_times': interrogated_times,
+        'subject': subject,
+    }
+    
+    return render(request, 'interrogazioni/materia.html', context)
 
 def update(request):
     # post request
@@ -26,21 +55,11 @@ def update(request):
         date = request.POST.get('date')
         
         print(name, subject, date)
-        
-        # get or create person
         person = Persona.objects.get(name=name)
+        subject = Materia.objects.get(name=subject)
         
-        # get or create subject
-        subject = Materia.objects.get(url_name=subject)
-        
-        # get last interrogation with this person and subject and update it
-        last_interrogation = LastInterrogation.objects.filter(person=person, subject=subject).first()
-        if last_interrogation:
-            last_interrogation.date = date
-            # use name of the month instead of number
-            last_interrogation.formatted_date = datetime.datetime.strptime(date, '%Y-%m-%d').strftime('%d %B')
-            last_interrogation.color = "green"
-            last_interrogation.save()
+        ref = db.reference("/" + subject.name + "/" + person.name)
+        ref.push(date)
         
         # reload page
         return HttpResponse("ok")
@@ -60,12 +79,12 @@ def reset2_view(request, subject):
         # get subject
         subject = Materia.objects.get(url_name=subject)
         
+        ref = db.reference("/" + subject.name)
+        ref.set({})
         # get all last interrogations with this subject and reset them
-        last_interrogations = LastInterrogation.objects.filter(subject=subject)
-        for last_interrogation in last_interrogations:
-            last_interrogation.color = "red"
-            last_interrogation.formatted_date = "mai"
-            last_interrogation.save()
+        for persona in Persona.objects.all():
+            ref = db.reference("/" + subject.name + "/" + persona.name)
+            ref.set({"placeholder": 0})
         
         # go to index
         return redirect('index')        

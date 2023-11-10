@@ -10,7 +10,10 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/4.2/ref/settings/
 """
 
+from firebase_admin import credentials
+import firebase_admin
 from pathlib import Path
+from decouple import config, Csv
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -37,7 +40,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    
+
     'interrogazioni',
 ]
 
@@ -125,3 +128,23 @@ STATIC_URL = 'static/'
 # https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+
+FIREBASE_CREDENTIALS = {
+    "type": config("FIREBASE_TYPE"),
+    "project_id": config("FIREBASE_PROJECT_ID"),
+    "private_key_id": config("FIREBASE_PRIVATE_KEY_ID"),
+    "private_key": config("FIREBASE_PRIVATE_KEY").replace("\\n", "\n"),
+    "client_email": config("FIREBASE_CLIENT_EMAIL"),
+    "client_id": config("FIREBASE_CLIENT_ID"),
+    "auth_uri": config("FIREBASE_AUTH_URI"),
+    "token_uri": config("FIREBASE_TOKEN_URI"),
+    "auth_provider_x509_cert_url": config("FIREBASE_AUTH_PROVIDER_X509_CERT_URL"),
+    "client_x509_cert_url": config("FIREBASE_CLIENT_X509_CERT_URL"),
+}
+
+
+cred = credentials.Certificate(FIREBASE_CREDENTIALS)
+firebase_admin.initialize_app(cred, {
+    'databaseURL': 'https://domanitiinterrogo-default-rtdb.europe-west1.firebasedatabase.app/',
+})

@@ -66,7 +66,7 @@
 				cursor: pointer;
 			}
 			.update {
-                display: none;
+				display: none;
 				color: black;
 				padding: 0em 5% 1em 5%;
 				position: fixed;
@@ -75,13 +75,12 @@
 				margin-top: 20px;
 				background-color: #f1f1f1;
 				border: 1px solid black;
-                border-radius: 10px;
+				border-radius: 10px;
 			}
 			.input-data {
 				display: grid;
 				grid-template-columns: 1.5fr 1fr;
 				align-items: center;
-                
 			}
 			.input-data p {
 				margin: 0;
@@ -93,21 +92,21 @@
 				border: none;
 				border-radius: 5px;
 			}
-            .buttons {
-                display: flex;
-                justify-content: space-around;
-                align-items: center;
-                margin-top: 10px;
-            }
-            .buttons button {
-                background-color: #4ea5d1;
+			.buttons {
+				display: flex;
+				justify-content: space-around;
+				align-items: center;
+				margin-top: 10px;
+			}
+			.buttons button {
+				background-color: #4ea5d1;
 				color: #ffffff;
 				border: none;
 				border-radius: 5px;
 				padding: 5px 10px;
 				font-size: 0.9em;
 				cursor: pointer;
-            }
+			}
 		</style>
 	</head>
 	<body>
@@ -136,14 +135,16 @@
 			<table>
 				<thead>
 					<th>Nome</th>
-					<th>Ultima Interrogazione?</th>
+					<th>Interrogazione</th>
+					<th>Volte</th>
 					<th></th>
 				</thead>
 				<tbody>
-					{% for last in last_interrogations %}
-					<tr>
-						<td>{{last.person.name}}</td>
-						<td style="color: {{last.color}}">{{last.formatted_date}}</td>
+					{% for person in people %}
+					<tr id="{{person}}">
+						<td class="name-td"></td>
+						<td class="date-td"></td>
+						<td class="times-td"></td>
 						<td><button class="update-button">Aggiorna</button></td>
 					</tr>
 					{% endfor %}
@@ -155,14 +156,67 @@
 		<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 
 		<script>
-			
+			$(document).ready(function() {
+
+				people = {{ people|safe }}
+				interrogations = {{ interrogations|safe }}
+				console.log(interrogations)
+				interrogated_times = {{ interrogated_times|safe }}
+				colors = []
+
+
+				for (let i = 0; i < interrogations.length; i++) {
+					console.log(interrogations[i])
+
+					if ($.isEmptyObject(interrogations[i])) {
+						interrogations[i] = "mai";
+						colors.push("red");
+					} else {
+						interrogations[i] = Object.values(interrogations[i])[Object.values(interrogations[i]).length - 1];
+						colors.push("green");
+
+						var dateString = "2023/11/02";
+
+
+						// Convert the date string to a Date object
+						var dateObject = new Date(interrogations[i]);
+
+						// Get the day, month, and year components
+						var day = dateObject.getDate();
+						var month = dateObject.getMonth(); // Note: Months are zero-indexed
+						var year = dateObject.getFullYear();
+
+						// Array of month names
+						var monthNames = [
+						"Gennaio", "Febbraio", "Marzo", "Aprile",
+						"Maggio", "Giugno", "Luglio", "Agosto",
+						"Settembre", "Ottobre", "Novembre", "Dicembre"
+						];
+
+						// Format the date
+						var formattedDate = day + ' ' + monthNames[month];
+						interrogations[i] = formattedDate;
+
+					}
+				}
+
+
+				for (let i = 0; i < people.length; i++) {
+					$(`#${people[i]}`).children(".name-td").text(people[i]);
+					$(`#${people[i]}`).children(".date-td").text(interrogations[i]);
+					$(`#${people[i]}`).children(".date-td").css("color", colors[i]);
+					$(`#${people[i]}`).children(".times-td").text(interrogated_times[i]);
+				}
+			});
+
+
 			$(".update-button").on("click", function() {
 					$(".person-name").val($(this)[0].parentNode.parentNode.children[0].innerText)
 					$(".update").show();
 
 					// $(this)[0].parentNode.parentNode.children[0].innerText
-                });
-			
+			             });
+
 			$("#back-btn").on("click", () => {
 				$(".update").hide();
 			});
