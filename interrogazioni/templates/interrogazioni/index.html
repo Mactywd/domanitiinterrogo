@@ -63,9 +63,9 @@
         </nav>
 
 		<main>
-			{% for materia in materie %}
-				<a href="/materia/{{materia.url_name}}"> 
-					<div class="materia">{{materia.name}}</div>
+			{% for materia, url_materia in materie %}
+				<a href="/materia/{{url_materia}}"> 
+					<div class="materia">{{materia}}</div>
 				</a>
 			{% endfor %}
 		</main>

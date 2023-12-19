@@ -66,9 +66,9 @@
         </nav>
         <h3>Seleziona una materia da resettare</h1>
 		<main>
-			{% for materia in materie %}
-				<a href="/reset/{{materia.url_name}}"> 
-					<div class="materia">{{materia.name}}</div>
+			{% for materia, url_name in materie %}
+				<a href="/reset/{{url_name}}"> 
+					<div class="materia">{{materia}}</div>
 				</a>
 			{% endfor %}
 		</main>

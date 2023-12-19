@@ -3,7 +3,8 @@ from datetime import datetime
 from django.db.models.signals import pre_save
 from django.dispatch import receiver
 # Create your models here.
-    
+
+'''    
 class Persona(models.Model):
     name = models.CharField(max_length=50)
     
@@ -32,3 +33,4 @@ class LastInterrogation(models.Model):
     
     def __str__(self):
         return self.person.name + ' ' + self.subject.name + ' ' + self.date.strftime('%d/%m/%Y %H:%M:%S')
+'''

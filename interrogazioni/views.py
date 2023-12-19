@@ -1,5 +1,4 @@
 from django.shortcuts import render
-from .models import Persona, Materia, LastInterrogation
 from django.http import HttpResponse, HttpResponseForbidden
 from django.shortcuts import redirect
 import datetime
@@ -8,7 +7,15 @@ import json
 
 # Create your views here.
 def index(request):
-    materie = Materia.objects.all()
+    ref = db.reference("/")
+    materie = ref.get().keys()
+    materie = list(materie)
+    
+    url_materie = []
+    
+    for materia in materie:
+        url_materie.append(materia.replace(" ", "_").lower())
+    
     
     #### TEMPORARY ####
     # # reset everything
@@ -17,11 +24,11 @@ def index(request):
     #         ref = db.reference("/" + subject.name + "/" + persona.name)
     #         ref.set({"placeholder": 0})
     
-    return render(request, 'interrogazioni/index.html', {'materie': materie})
+    return render(request, 'interrogazioni/index.html', {'materie': zip(materie, url_materie)})
 
 def materia(request, subject):
-    subject = Materia.objects.get(url_name=subject)
-    ref = db.reference("/" + subject.name)
+    name = subject.replace("_", " ").title()
+    ref = db.reference("/" + name)
     interrogated = ref.get()
     
     people = list(interrogated.keys())
@@ -55,10 +62,11 @@ def update(request):
         date = request.POST.get('date')
         
         print(name, subject, date)
-        person = Persona.objects.get(name=name)
-        subject = Materia.objects.get(name=subject)
         
-        ref = db.reference("/" + subject.name + "/" + person.name)
+        sub_name = subject.replace("_", " ").title()
+        ref = db.reference("/" + sub_name + "/" + name)
+        print(ref.path)
+        
         ref.push(date)
         
         # reload page
@@ -67,9 +75,16 @@ def update(request):
 
 def reset_view(request):
     if request.user.is_superuser:
-        materie = Materia.objects.all()
+        ref = db.reference("/")
+        materie = ref.get().keys()
+        materie = list(materie)
+
+        url_materie = []    
+        for materia in materie:
+            url_materie.append(materia.replace(" ", "_").lower())
+        
     
-        return render(request, 'interrogazioni/reset.html', {'materie': materie})
+        return render(request, 'interrogazioni/reset.html', {'materie': zip(materie, url_materie)})
 
     else:
         return HttpResponseForbidden("Access denied")
@@ -77,13 +92,16 @@ def reset_view(request):
 def reset2_view(request, subject):
     if request.user.is_superuser:
         # get subject
-        subject = Materia.objects.get(url_name=subject)
+        real_name = subject.replace("_", " ").title()
         
-        ref = db.reference("/" + subject.name)
+        ref = db.reference("/" + real_name)
+        people = ref.get().keys()
+        people = list(people)
         ref.set({})
+        
         # get all last interrogations with this subject and reset them
-        for persona in Persona.objects.all():
-            ref = db.reference("/" + subject.name + "/" + persona.name)
+        for persona in people:
+            ref = db.reference("/" + real_name + "/" + persona)
             ref.set({"placeholder": 0})
         
         # go to index
