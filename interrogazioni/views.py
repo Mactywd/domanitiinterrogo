@@ -109,3 +109,37 @@ def reset2_view(request, subject):
         
     else:
         return HttpResponseForbidden("Access denied")
+
+def delete(request):
+    name = request.POST.get('name')
+    subject = request.POST.get('subject')
+    date = request.POST.get('date')
+    subject = subject.replace("_", " ").title()
+    
+    formatted_date = ""
+    if date != "NaN undefined":
+            
+        date = date.split(" ")
+        
+        # Month conversion
+        months = ["Gennaio", "Febbraio", "Marzo", "Aprile", "Maggio", "Giugno", "Luglio", "Agosto", "Settembre", "Ottobre", "Novembre", "Dicembre"]
+        month = months.index(date[1]) + 1
+        month = f"0{month}" if month < 10 else str(month)
+        
+        # Year conversion
+        year = 2024 if int(month) < 9 else 2023
+        
+        # Day conversion
+        day = int(date[0])
+        day = f"0{day}" if day < 10 else str(day)
+        
+        formatted_date = f"{year}-{month}-{day}"
+    
+    ref = db.reference("/" + subject + "/" + name)
+    interrogations = ref.get()
+    for key, value in interrogations.items():
+        if value in [formatted_date, ""]:
+            ref.child(key).delete()
+            break
+    
+    return HttpResponse("ok")

@@ -98,7 +98,7 @@
 				align-items: center;
 				margin-top: 10px;
 			}
-			.buttons button {
+			#update-btn, #back-btn {
 				background-color: #4ea5d1;
 				color: #ffffff;
 				border: none;
@@ -106,6 +106,23 @@
 				padding: 5px 10px;
 				font-size: 0.9em;
 				cursor: pointer;
+			}
+			.interrogation-data {
+				display: flex;
+				justify-content: space-between;
+				align-items: center;
+			}
+			.interrogation-data button {
+				background-color: #ff0000;
+				color: #ffffff;
+				border: none;
+				border-radius: 5px;
+				padding: 5px 10px;
+				font-size: 0.9em;
+				cursor: pointer;
+			}
+			.interrogation-date {
+				font-weight: normal;
 			}
 		</style>
 	</head>
@@ -120,6 +137,8 @@
 			<div class="update">
 				<h2>Aggiorna Interrogazioni</h2>
 				<!-- input for nome and ultima interrogazione without forms -->
+				<hr>
+				<h4>Aggiungi Interrogazione<h4>
 				<div class="input-data">
 					<p>Nome:</p>
 					<input type="text" class="person-name" value="" readonly />
@@ -127,9 +146,27 @@
 					<input type="date" class="new-date" />
 				</div>
 				<div class="buttons">
-					<button id="back-btn">Indietro</button>
 					<button id="update-btn">Aggiorna</button>
 				</div>
+				<hr>
+				<h4>Rimuovi Interrogazione<h4>
+					<div class="del-data">
+					</div>
+					
+					{% comment %} <div class="del-data">
+						<p>12/4/2023</p>
+						<button>Elimina</button>
+					</div>
+					<div class="del-data">
+						<p>17/5/2023</p>
+						<button>Elimina</button>
+					</div>
+					<div class="del-data">
+						<p>19/8/2023</p>
+						<button>Elimina</button>
+					</div> {% endcomment %}
+				<hr>
+				<button id="back-btn">Indietro</button>
 			</div>
 
 			<table>
@@ -156,6 +193,27 @@
 		<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 
 		<script>
+			function dateFormatter(date) {
+				// Convert the date string to a Date object
+				var dateObject = new Date(date);
+
+				// Get the day, month, and year components
+				var day = dateObject.getDate();
+				var month = dateObject.getMonth(); // Note: Months are zero-indexed
+				var year = dateObject.getFullYear();
+
+				// Array of month names
+				var monthNames = [
+				"Gennaio", "Febbraio", "Marzo", "Aprile",
+				"Maggio", "Giugno", "Luglio", "Agosto",
+				"Settembre", "Ottobre", "Novembre", "Dicembre"
+				];
+
+				// Format the date
+				var formattedDate = day + ' ' + monthNames[month];
+				return formattedDate;
+			}
+
 			$(document).ready(function() {
 
 				people = {{ people|safe }}
@@ -175,26 +233,7 @@
 						interrogations[i] = Object.values(interrogations[i])[Object.values(interrogations[i]).length - 1];
 						colors.push("green");
 
-						var dateString = "2023/11/02";
-
-
-						// Convert the date string to a Date object
-						var dateObject = new Date(interrogations[i]);
-
-						// Get the day, month, and year components
-						var day = dateObject.getDate();
-						var month = dateObject.getMonth(); // Note: Months are zero-indexed
-						var year = dateObject.getFullYear();
-
-						// Array of month names
-						var monthNames = [
-						"Gennaio", "Febbraio", "Marzo", "Aprile",
-						"Maggio", "Giugno", "Luglio", "Agosto",
-						"Settembre", "Ottobre", "Novembre", "Dicembre"
-						];
-
-						// Format the date
-						var formattedDate = day + ' ' + monthNames[month];
+						formattedDate = dateFormatter(interrogations[i]);
 						interrogations[i] = formattedDate;
 
 					}
@@ -212,16 +251,37 @@
 
 			$(".update-button").on("click", function() {
 					$(".person-name").val($(this)[0].parentNode.parentNode.children[0].innerText)
+
+					// get dates of past interrogations
+					interrogations = {{ interrogations|safe }}
+					person = $(this)[0].parentNode.parentNode.children[0].innerText
+					console.log(person)
+					console.log(interrogations)
+					
+					// get person index
+					person_index = people.indexOf(person)
+					console.log(interrogations[person_index])
+
+					interrogation_dates = Object.values(interrogations[person_index])
+
+					$('.del-data').empty()
+					for (let i = 0; i < interrogation_dates.length; i++) {
+						// add dates to .del-data
+						$('.del-data').append(`<div class="interrogation-data"> <p class="interrogation-date">${dateFormatter(interrogation_dates[i])}</p> <button class="del-button">Elimina</button> </div>`)
+					}
 					$(".update").show();
 
 					// $(this)[0].parentNode.parentNode.children[0].innerText
-			             });
+			});
 
 			$("#back-btn").on("click", () => {
 				$(".update").hide();
 			});
 
 			$("#update-btn").on("click", () => {
+				if ($(".new-date").val() == "") {
+					return;
+				}
 				// ajax request
 				$.ajax({
 					url: "/update/",
@@ -242,6 +302,24 @@
 
 				$(".update").hide();
 			});
+
+			$('.del-data').on('click', '.del-button', function() {
+				$.ajax({
+					url: "/delete/",
+					type: "POST",
+					headers: {
+						'X-CSRFToken': "{{ csrf_token }}",
+					},
+					data: {
+						name: $(".person-name").val(),
+						date: $(this).siblings('.interrogation-date').text(),
+						subject: "{{subject}}",
+					},
+					success: function(response) {
+						location.reload();
+					},
+				});
+			})
 		</script>
 	</body>
 </html>

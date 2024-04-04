@@ -7,4 +7,5 @@ urlpatterns = [
     path('update/', views.update, name='update'),
     path('reset/', views.reset_view, name='reset'),
     path('reset/<str:subject>', views.reset2_view, name='reset'),
+    path('delete/', views.delete, name='delete')
 ]
