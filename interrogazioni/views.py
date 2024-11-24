@@ -1,54 +1,67 @@
 from django.shortcuts import render
 from django.http import HttpResponse, HttpResponseForbidden
 from django.shortcuts import redirect
-import datetime
 from firebase_admin import db
-import json
+
+####### UTILITY FUNCTIONS #######
+
+def RESET_EVERYTHING():
+    '''
+    usually just added  to the 'index' function when needed.
+    temporary function, not supposed to be used indefinitely
+    '''
+    ref = db.reference("/")
+    materie = ["Arte", "Commedia", "Filosofia", "Inglese", "Italiano", "Latino", "Matematica", "Scienze", "Storia"]
+    persone = ["Armini", "Bucci", "Canne", "Cauceglia", "Cennini", "Faggioli", "Fe", "Girellini", "Lenti", "Lorenzoni", "Maione", "Montesi", "Niglio", "Polino", "Resuli", "Siebetcheu"]
+    
+    interrogazioni = {}
+    for materia in materie:
+        interrogazioni[materia] = {}
+        for persona in persone:
+            interrogazioni[materia][persona] = ["placeholder",]
+    
+    ref.set({
+        'materie': materie,
+        'persone': persone,
+        'interrogazioni': interrogazioni
+    })
+
+def get_from_db(to_get):
+    '''
+    possible to_get: materie, persone, interrogazioni, interrogazioni/<materia>
+    '''
+
+    ref = db.reference("/" + to_get)
+    return ref.get()
 
 # Create your views here.
 def index(request):
-    ref = db.reference("/")
-    materie = ref.get().keys()
-    materie = list(materie)
     
-    url_materie = []
+    #RESET_EVERYTHING() # normally not used, uncomment if needed
     
-    for materia in materie:
-        url_materie.append(materia.replace(" ", "_").lower())
-    
-    
-    #### TEMPORARY ####
-    # # reset everything
-    # for subject in materie:
-    #     for persona in Persona.objects.all():
-    #         ref = db.reference("/" + subject.name + "/" + persona.name)
-    #         ref.set({"placeholder": 0})
-    
-    return render(request, 'interrogazioni/index.html', {'materie': zip(materie, url_materie)})
+    materie = get_from_db("materie")
+    return render(request, 'interrogazioni/index.html', {'materie': materie})
 
-def materia(request, subject):
-    name = subject.replace("_", " ").title()
-    ref = db.reference("/" + name)
-    interrogated = ref.get()
+def materia(request, materia):
+    interrogazioni_materia = get_from_db(f"interrogazioni/{materia}")
     
-    people = list(interrogated.keys())
-    interrogations = list(interrogated.values())
-    for i in range(len(interrogations)):
-        # interrogations[i] = {"placeholder": 0, "jn77tGGUh--": "2021-10-10"}
-        # remove placeholder
-        interrogations[i].pop("placeholder")
+    persone = list(interrogazioni_materia.keys())
+           
+    interrogazioni = []
+    for persona in persone:
+        interrogazioni_materia_persona = list(interrogazioni_materia[persona])
+        interrogazioni.append(interrogazioni_materia_persona[1:]) # first is a placeholder
         
         
-        
-    interrogated_times = []
-    for interrogation in interrogations:
-        interrogated_times.append(len(interrogation))   
+    numero_interrogazioni = []
+    for interrogazione in interrogazioni:
+        numero_interrogazioni.append(len(interrogazione))   
     
     context = {
-        'people': people,
-        'interrogations': interrogations,
-        'interrogated_times': interrogated_times,
-        'subject': subject,
+        'persone': persone,
+        'interrogazioni': interrogazioni,
+        'numero_interrogazioni': numero_interrogazioni,
+        'materia': materia
     }
     
     return render(request, 'interrogazioni/materia.html', context)
@@ -57,89 +70,72 @@ def update(request):
     # post request
     if request.method == 'POST':
         # get data
-        name = request.POST.get('name')
-        subject = request.POST.get('subject')
-        date = request.POST.get('date')
-        
-        print(name, subject, date)
-        
-        sub_name = subject.replace("_", " ").title()
-        ref = db.reference("/" + sub_name + "/" + name)
-        print(ref.path)
-        
-        ref.push(date)
+        nome = request.POST.get('nome')
+        materia = request.POST.get('materia')
+        data = request.POST.get('data')
+    
+        ref = db.reference("/interrogazioni/" + materia + "/" + nome)
+        interrogazioni = ref.get()
+        interrogazioni.append(data)
+        ref.set(interrogazioni)
         
         # reload page
         return HttpResponse("ok")
-
-
-def reset_view(request):
-    if request.user.is_superuser:
-        ref = db.reference("/")
-        materie = ref.get().keys()
-        materie = list(materie)
-
-        url_materie = []    
-        for materia in materie:
-            url_materie.append(materia.replace(" ", "_").lower())
-        
-    
-        return render(request, 'interrogazioni/reset.html', {'materie': zip(materie, url_materie)})
-
-    else:
-        return HttpResponseForbidden("Access denied")
-
-def reset2_view(request, subject):
-    if request.user.is_superuser:
-        # get subject
-        real_name = subject.replace("_", " ").title()
-        
-        ref = db.reference("/" + real_name)
-        people = ref.get().keys()
-        people = list(people)
-        ref.set({})
-        
-        # get all last interrogations with this subject and reset them
-        for persona in people:
-            ref = db.reference("/" + real_name + "/" + persona)
-            ref.set({"placeholder": 0})
-        
-        # go to index
-        return redirect('index')        
-        
-    else:
-        return HttpResponseForbidden("Access denied")
-
 def delete(request):
-    name = request.POST.get('name')
-    subject = request.POST.get('subject')
-    date = request.POST.get('date')
-    subject = subject.replace("_", " ").title()
+    nome = request.POST.get('nome')
+    materia = request.POST.get('materia')
+    data = request.POST.get('data')
     
     formatted_date = ""
-    if date != "NaN undefined":
-            
-        date = date.split(" ")
+    if data != "NaN undefined":
+        
+        
+        data = data.split(" ")
         
         # Month conversion
-        months = ["Gennaio", "Febbraio", "Marzo", "Aprile", "Maggio", "Giugno", "Luglio", "Agosto", "Settembre", "Ottobre", "Novembre", "Dicembre"]
-        month = months.index(date[1]) + 1
+        months = ["Gen", "Feb", "Mar", "Apr", "Mag", "Giu", "Lug", "Ago", "Set", "Ott", "Nov", "Dic"]
+        month = months.index(data[1]) + 1
         month = f"0{month}" if month < 10 else str(month)
         
-        # Year conversion
-        year = 2024 if int(month) < 9 else 2023
+        year = 2025 if int(month) < 9 else 2024
         
-        # Day conversion
-        day = int(date[0])
+        day = int(data[0])
         day = f"0{day}" if day < 10 else str(day)
         
         formatted_date = f"{year}-{month}-{day}"
     
-    ref = db.reference("/" + subject + "/" + name)
-    interrogations = ref.get()
-    for key, value in interrogations.items():
-        if value in [formatted_date, ""]:
-            ref.child(key).delete()
+    ref = db.reference("/interrogazioni/" + materia + "/" + nome)
+    interrogazioni = ref.get()
+    for data in interrogazioni:
+        if data in [formatted_date, ""]:
+            interrogazioni.remove(data)
+            ref.set(interrogazioni)
             break
-    
+    else:
+        return HttpResponse(500, status=500)
     return HttpResponse("ok")
+
+
+######## RESET ########
+def reset_view(request):
+    if request.user.is_superuser:
+        materie = get_from_db("materie")      
+        return render(request, 'interrogazioni/reset.html', {'materie': materie})
+
+    else:
+        return HttpResponseForbidden("Access denied")
+
+def reset2_view(request, materia):
+    if request.user.is_superuser:
+        persone = get_from_db("persone")
+        
+        # get all last interrogations with this subject and reset them
+        for persona in persone:
+            ref = db.reference("/interrogazioni/" + materia + "/" + persona)
+            ref.set(["placeholder",])
+        
+        # go to index
+        return redirect('reset')        
+        
+    else:
+        return HttpResponseForbidden("Access denied")

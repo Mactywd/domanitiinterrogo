@@ -18,7 +18,12 @@ from django.contrib import admin
 from django.urls import path
 from django.urls import include
 
+from . import views
+
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('', include('interrogazioni.urls')),
+    path('interrogazioni/', include('interrogazioni.urls')),
+    path('', views.index, name='index'),
+    path('estrazione/', include('estrazione.urls')),
+    path('manage', views.manage, name="manage")
 ]

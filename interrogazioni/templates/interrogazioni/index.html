@@ -3,7 +3,7 @@
 	<head>
 		<meta charset="UTF-8" />
 		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-		<title>Something</title>
+		<title>Interrogazioni</title>
 
 		<style>
 			body {
@@ -63,8 +63,8 @@
         </nav>
 
 		<main>
-			{% for materia, url_materia in materie %}
-				<a href="/materia/{{url_materia}}"> 
+			{% for materia in materie %}
+				<a href="/interrogazioni/materia/{{materia}}"> 
 					<div class="materia">{{materia}}</div>
 				</a>
 			{% endfor %}

@@ -61,7 +61,7 @@ ROOT_URLCONF = 'domanitiinterrogo.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': ['interrogazioni/templates'],
+        'DIRS': ['interrogazioni/templates', 'domanitiinterrogo/templates', 'estrazione/templates'],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [

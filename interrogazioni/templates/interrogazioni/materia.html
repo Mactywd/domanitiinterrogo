@@ -65,6 +65,12 @@
 				font-size: 0.9em;
 				cursor: pointer;
 			}
+
+			.index-td {
+				color: #4ea5d1;
+				font-weight: bold;
+			}
+
 			.update {
 				display: none;
 				color: black;
@@ -152,33 +158,22 @@
 				<h4>Rimuovi Interrogazione<h4>
 					<div class="del-data">
 					</div>
-					
-					{% comment %} <div class="del-data">
-						<p>12/4/2023</p>
-						<button>Elimina</button>
-					</div>
-					<div class="del-data">
-						<p>17/5/2023</p>
-						<button>Elimina</button>
-					</div>
-					<div class="del-data">
-						<p>19/8/2023</p>
-						<button>Elimina</button>
-					</div> {% endcomment %}
 				<hr>
 				<button id="back-btn">Indietro</button>
 			</div>
 
 			<table>
 				<thead>
+					<th></th>
 					<th>Nome</th>
 					<th>Data</th>
-					<th>Volte</th>
+					<th>Numero</th>
 					<th></th>
 				</thead>
 				<tbody>
-					{% for person in people %}
-					<tr id="{{person}}">
+					{% for persona in persone %}
+					<tr id="{{persona}}">
+						<td class="index-td"></td>
 						<td class="name-td"></td>
 						<td class="date-td"></td>
 						<td class="times-td"></td>
@@ -204,9 +199,9 @@
 
 				// Array of month names
 				var monthNames = [
-				"Gennaio", "Febbraio", "Marzo", "Aprile",
-				"Maggio", "Giugno", "Luglio", "Agosto",
-				"Settembre", "Ottobre", "Novembre", "Dicembre"
+				"Gen", "Feb", "Mar", "Apr",
+				"Mag", "Giu", "Lug", "Ago",
+				"Set", "Ott", "Nov", "Dic"
 				];
 
 				// Format the date
@@ -216,62 +211,58 @@
 
 			$(document).ready(function() {
 
-				people = {{ people|safe }}
-				interrogations = {{ interrogations|safe }}
-				console.log(interrogations)
-				interrogated_times = {{ interrogated_times|safe }}
+				persone = {{ persone|safe }}
+				interrogazioni = {{ interrogazioni|safe }}
+				numero_interrogazioni = {{ numero_interrogazioni|safe}}
+
+
+				// display ultima data di interrogazioni
 				colors = []
+				display_date = []
 
+				for (let persona = 0; persona < interrogazioni.length; persona++) {
 
-				for (let i = 0; i < interrogations.length; i++) {
-					console.log(interrogations[i])
-
-					if ($.isEmptyObject(interrogations[i])) {
-						interrogations[i] = "mai";
+					if (!interrogazioni[persona].length) { // se non interrogato allora scrivi 'mai' di rosso
+						display_date.push("mai")
 						colors.push("red");
-					} else {
-						interrogations[i] = Object.values(interrogations[i])[Object.values(interrogations[i]).length - 1];
-						colors.push("green");
 
-						formattedDate = dateFormatter(interrogations[i]);
-						interrogations[i] = formattedDate;
+					} else { // altrimenti scrivi la data dell'ultima interrogazione di verde
+						date = interrogazioni[persona].at(-1)
+						formatted_date = dateFormatter(date)
 
+						display_date.push(formatted_date)
+						colors.push("green")
 					}
 				}
 
-
-				for (let i = 0; i < people.length; i++) {
-					$(`#${people[i]}`).children(".name-td").text(people[i]);
-					$(`#${people[i]}`).children(".date-td").text(interrogations[i]);
-					$(`#${people[i]}`).children(".date-td").css("color", colors[i]);
-					$(`#${people[i]}`).children(".times-td").text(interrogated_times[i]);
+				// populate table
+				for (let i = 0; i < persone.length; i++) {
+					$(`#${persone[i]}`).children(".index-td").text(i+1);
+					$(`#${persone[i]}`).children(".name-td").text(persone[i]);
+					$(`#${persone[i]}`).children(".date-td").text(display_date[i]);
+					$(`#${persone[i]}`).children(".date-td").css("color", colors[i]);
+					$(`#${persone[i]}`).children(".times-td").text(numero_interrogazioni[i]);
 				}
 			});
 
 
 			$(".update-button").on("click", function() {
-					$(".person-name").val($(this)[0].parentNode.parentNode.children[0].innerText)
+					$(".person-name").val($(this)[0].parentNode.parentNode.children[1].innerText)
 
-					// get dates of past interrogations
-					interrogations = {{ interrogations|safe }}
-					person = $(this)[0].parentNode.parentNode.children[0].innerText
-					console.log(person)
-					console.log(interrogations)
-					
-					// get person index
-					person_index = people.indexOf(person)
-					console.log(interrogations[person_index])
-
-					interrogation_dates = Object.values(interrogations[person_index])
+					// update the manage section and show it
+					persona = $(this)[0].parentNode.parentNode.children[1].innerText
+					persona_index = persone.indexOf(persona)
+					date_interrogazioni = interrogazioni[persona_index]
 
 					$('.del-data').empty()
-					for (let i = 0; i < interrogation_dates.length; i++) {
-						// add dates to .del-data
-						$('.del-data').append(`<div class="interrogation-data"> <p class="interrogation-date">${dateFormatter(interrogation_dates[i])}</p> <button class="del-button">Elimina</button> </div>`)
+					for (let i = 0; i < date_interrogazioni.length; i++) {
+						$('.del-data').append(
+							`<div class="interrogation-data"> 
+								<p class="interrogation-date">${dateFormatter(date_interrogazioni[i])}</p> 
+								<button class="del-button">Elimina</button> 
+							</div>`)
 					}
 					$(".update").show();
-
-					// $(this)[0].parentNode.parentNode.children[0].innerText
 			});
 
 			$("#back-btn").on("click", () => {
@@ -279,20 +270,21 @@
 			});
 
 			$("#update-btn").on("click", () => {
-				if ($(".new-date").val() == "") {
+				// foolproof
+				if ($(".new-date").val() == "") {	
 					return;
 				}
-				// ajax request
+				
 				$.ajax({
-					url: "/update/",
+					url: "/interrogazioni/update/",
 					type: "POST",
 					headers: {
 						'X-CSRFToken': "{{ csrf_token }}",
 					},
 					data: {
-						name: $(".person-name").val(),
-						date: $(".new-date").val(),
-						subject: "{{subject}}",
+						nome: $(".person-name").val(),
+						data: $(".new-date").val(),
+						materia: "{{materia}}",
 					},
 					success: function(response) {
 						location.reload();
@@ -305,15 +297,15 @@
 
 			$('.del-data').on('click', '.del-button', function() {
 				$.ajax({
-					url: "/delete/",
+					url: "/interrogazioni/delete/",
 					type: "POST",
 					headers: {
 						'X-CSRFToken': "{{ csrf_token }}",
 					},
 					data: {
-						name: $(".person-name").val(),
-						date: $(this).siblings('.interrogation-date').text(),
-						subject: "{{subject}}",
+						nome: $(".person-name").val(),
+						data: $(this).siblings('.interrogation-date').text(),
+						materia: "{{materia}}",
 					},
 					success: function(response) {
 						location.reload();

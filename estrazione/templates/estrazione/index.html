@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<title>Document</title>
+
+		<style>
+			/* NAVBAR */
+			body {
+				margin: 0;
+				padding: 0;
+				background-color: #f1f1f1;
+			}
+
+			nav {
+				background-color: #fff;
+				height: 60px;
+				display: flex;
+				justify-content: flex-start;
+				align-items: center;
+			}
+			nav a {
+				text-decoration: none;
+				color: #4ea5d1;
+				font-weight: bold;
+				font-size: 20px;
+				margin-left: 20px;
+			}
+
+			img {
+				height: 40px;
+				margin-left: 20px;
+			}
+
+			/* ESTRAZIONE */
+			/*.estrazione {
+                width: 70%;
+                margin: 2em auto;
+                padding: 1em;
+                display: flex;
+                background-color: white
+            }*/
+
+			.estrazione {
+				width: 70%;
+				margin: 2em auto;
+				padding: 1em;
+				background-color: #fff;
+				border-radius: 5px;
+				padding: 20px;
+				box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
+				text-align: center;
+			}
+			.estrazione:hover {
+				box-shadow: 0 0 5px rgba(0, 0, 0, 0.3);
+			}
+
+			.title {
+				color: #499dc7;
+				margin-bottom: 1em;
+				margin-top: 0;
+				font-weight: bold;
+				font-size: 1.5em;
+			}
+			span {
+				color: #499dc7;
+			}
+			.estrazione a {
+				text-decoration: none;
+				color: inherit;
+			}
+		</style>
+	</head>
+	<body>
+		<nav>
+			<img src="https://i.imgur.com/GOYwxYO.png" alt="logo" />
+			<!-- <a href="."><img src="https://i.imgur.com/lJKFrz5.png" alt="Interrogazioni"></a> -->
+			<a href=".">Interrogazioni</a>
+		</nav>
+
+		<main>
+			<div class="estrazione">
+				<a href="./2">
+					<p class="title">Estrazione Inglese</p>
+					<p class="data">
+						del <span class="date">6/01/2024</span> alle
+						<span class="time">18:27</span>
+					</p>
+				</a>
+			</div>
+			<div class="estrazione">
+				<a href="./1">
+					<p class="title">Cavie per Francesca</p>
+					<p class="data">
+						del <span class="date">3/12/2024</span> alle
+						<span class="time">15:07</span>
+					</p>
+				</a>
+			</div>
+			<div class="estrazione">
+				<a href="./0">
+					<p class="title">Volontari Arte</p>
+					<p class="data">
+						del <span class="date">19/11/2024</span> alle
+						<span class="time">19:46</span>
+					</p>
+				</a>
+			</div>
+		</main>
+
+		<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+		<script>
+			$(".estrazione").on("click", function () {
+				id = $(this).attr("id");
+			});
+		</script>
+	</body>
+</html>
