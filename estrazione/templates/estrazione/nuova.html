@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<title>Estrazione</title>
+		<style>
+			/* NAVBAR */
+			body {
+				margin: 0;
+				padding: 0;
+				background-color: #f1f1f1;
+			}
+
+			nav {
+				background-color: #fff;
+				height: 60px;
+				display: flex;
+				justify-content: flex-start;
+				align-items: center;
+			}
+			nav a {
+				text-decoration: none;
+				color: #4ea5d1;
+				font-weight: bold;
+				font-size: 20px;
+				margin-left: 20px;
+			}
+
+			img {
+				height: 40px;
+				margin-left: 20px;
+			}
+
+			/* MAIN */
+			h1 {
+				text-align: center;
+				color: #2085b8;
+			}
+
+			main {
+				margin: 0 2em;
+			}
+			h3 {
+				color: #2085b8;
+			}
+
+			/* titolo */
+			.title {
+				display: flex;
+				margin-top: 3em;
+			}
+			.title h3 {
+				margin: 0;
+				margin-right: 1em;
+				font-size: 1.5em;
+			}
+			.title input {
+				font-size: 1.5em;
+				width: 100%;
+				color: #2085b8;
+				background-color: inherit;
+				border: 1px solid #2085b8;
+				border-radius: 5px;
+			}
+
+			/* persone estraibili */
+			.lista-estraibili ul {
+				list-style-type: none;
+				display: grid;
+				padding: 0;
+				grid-template-columns: repeat(auto-fit, minmax(calc(100% / 2), 1fr));
+			}
+			.lista-estraibili li {
+				margin-bottom: 0.5em;
+				padding: 10px;
+				margin: 3px;
+				text-align: center;
+				border-radius: 10px;
+				color: white;
+				user-select: none;
+			}
+
+			.selected {
+				background-color: #4ea5d1;
+			}
+			.unselected {
+				background-color: #4a6877;
+			}
+
+			/* Numero estratti */
+			.quantita input {
+				width: 100%;
+				appearance: none;
+				background-color: #4ea5d1;
+				height: 7px;
+				border-radius: 10px;
+			}
+			.quantita p {
+				text-align: center;
+				margin: 0;
+				margin-top: 0.5em;
+				font-size: 1.5em;
+				font-weight: bold;
+				color: #4ea5d1;
+			}
+
+			/* Bottoni */
+			.buttons {
+				display: flex;
+				justify-content: space-between;
+				margin-top: 3em;
+				margin-bottom: 4em;
+			}
+			.buttons button {
+				background-color: #4ea5d1;
+				color: white;
+				border: none;
+				padding: 15px 32px;
+				text-align: center;
+				text-decoration: none;
+				display: inline-block;
+				font-size: 16px;
+				cursor: pointer;
+				border-radius: 10px;
+			}
+			.buttons button:active {
+				background-color: #35708d;
+			}
+		</style>
+	</head>
+	<body>
+		<nav>
+			<img src="https://i.imgur.com/GOYwxYO.png" alt="logo" />
+			<!-- <a href="."><img src="https://i.imgur.com/lJKFrz5.png" alt="Interrogazioni"></a> -->
+			<a href=".">Interrogazioni</a>
+		</nav>
+
+		<h1>Nuova Estrazione</h1>
+
+		<main>
+			<div class="title">
+				<h3>Titolo:</h3>
+				<input type="text" name="titolo" id="titolo" />
+			</div>
+			<div class="lista-estraibili">
+				<h3>Persone estraibili:</h3>
+				<ul>
+					<!-- "Armini", "Bucci", "Canne", "Cauceglia", "Cennini", "Faggioli", "Fe", "Girellini", "Lenti", "Lorenzoni", "Maione", "Montesi", "Niglio", "Polino", "Resuli", "Siebetcheu" -->
+					<li class="selected">Armini</li>
+					<li class="selected">Bucci</li>
+					<li class="selected">Canne</li>
+					<li class="selected">Cauceglia</li>
+					<li class="selected">Cennini</li>
+					<li class="selected">Faggioli</li>
+					<li class="selected">Fe</li>
+					<li class="selected">Girellini</li>
+					<li class="selected">Lenti</li>
+					<li class="selected">Lorenzoni</li>
+					<li class="selected">Maione</li>
+					<li class="selected">Montesi</li>
+					<li class="selected">Niglio</li>
+					<li class="selected">Polino</li>
+					<li class="selected">Resuli</li>
+					<li class="selected">Siebetcheu</li>
+				</ul>
+			</div>
+			<div class="quantita">
+				<h3>Persone da estrarre:</h3>
+				<input
+					type="range"
+					id="slider"
+					min="1"
+					max="16"
+					value="1"
+					oninput="rangeValue.innerText = this.value"
+				/>
+				<p id="rangeValue">1</p>
+			</div>
+
+			<div class="buttons">
+				<button id="back">Indietro</button>
+				<button id="estrai">Estrai</button>
+			</div>
+		</main>
+
+		<script
+			src="https://code.jquery.com/jquery-3.6.0.min.js"
+			integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4="
+			crossorigin="anonymous"
+		></script>
+		<script>
+			$(document).ready(function() {
+			    $("li").on("click", function() {
+			        if ($(this).hasClass("selected")) {
+			            $(this).removeClass("selected")
+			            $(this).addClass("unselected")
+			        } else {
+			            $(this).removeClass("unselected")
+			            $(this).addClass("selected")
+			        }
+			    })
+
+
+			    $("#back").on("click", function() {
+			        window.history.back()
+			    })
+
+			    $("#estrai").on("click", function() {
+			        title = $("#titolo").val()
+
+			        selected_elements = $('.selected')
+			        selected_names = []
+			        for (i = 0; i < selected_elements.length; i++) {
+			            selected_names.push(selected_elements[i].innerHTML)
+			        }
+
+			        quantita = $("#slider").val()
+
+                    console.log(title, selected_names, quantita)
+
+			        $.ajax({
+			            url: "/estrazione/creanuova",
+			            type: "POST",
+			            data: {
+			                "title": title,
+			                "selected_names": selected_names,
+			                "quantita": quantita
+			            },
+			            success: function(data) {
+			                console.log(data)
+			            }
+			        })
+                })
+			})
+		</script>
+	</body>
+</html>

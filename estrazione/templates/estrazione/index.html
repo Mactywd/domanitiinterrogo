@@ -70,6 +70,28 @@
 				text-decoration: none;
 				color: inherit;
 			}
+
+			/* ADD BUTTON */
+			#add-button {
+				border: 2px solid #499dc7;
+				border-radius: 50px;
+				width: 44px;
+				height: 44px;
+				padding: 0;
+				scale: 1.5;
+				position: fixed;
+				bottom: 40px;
+				right: 40px;
+				background-color: inherit;
+			}
+
+			#add-button:active {
+				background-color: #cccccc
+			}
+
+			#add-button img {
+				margin: 0 auto;
+			}
 		</style>
 	</head>
 	<body>
@@ -78,7 +100,7 @@
 			<!-- <a href="."><img src="https://i.imgur.com/lJKFrz5.png" alt="Interrogazioni"></a> -->
 			<a href=".">Interrogazioni</a>
 		</nav>
-
+		
 		<main>
 			<div class="estrazione">
 				<a href="./2">
@@ -109,10 +131,19 @@
 			</div>
 		</main>
 
+		<!-- NEW EXTRACTION -->
+		<button id="add-button">
+			<img src="https://i.imgur.com/BJ8K1T3.png" alt="add" />
+		</button>
+
+		<div id="new-extraction">
+
+		</div>
+
 		<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 		<script>
-			$(".estrazione").on("click", function () {
-				id = $(this).attr("id");
+			$("#add-button").on("click", function () {
+				window.location.href = "./nuova";
 			});
 		</script>
 	</body>

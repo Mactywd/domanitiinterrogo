@@ -5,7 +5,7 @@ from firebase_admin import db
 
 ####### UTILITY FUNCTIONS #######
 
-def RESET_EVERYTHING():
+def RESET_EVERYTHING(): #### DO NOT USE AS-IS
     '''
     usually just added  to the 'index' function when needed.
     temporary function, not supposed to be used indefinitely
