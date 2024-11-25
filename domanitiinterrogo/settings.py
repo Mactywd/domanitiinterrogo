@@ -28,9 +28,7 @@ SECRET_KEY = 'django-insecure-b$#lwy9qplj5bf5ogb+5st-&w5*nwvbkbl5427f$%rd))r11dm
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['*', 'http://*.domanitiinterrogo.website', 'https://*.domanitiinterrogo.website', 
-                      'http://domanitiinterrogo.website/*', 'https://domanitiinterrogo.website/*',
-                      'http://*.domanitiinterrogo.website/*', "https://*.domanitiinterrogo.website/*"]
+ALLOWED_HOSTS = ['*']
 
 
 # Application definition
@@ -56,7 +54,7 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
 
-CSRF_TRUSTED_ORIGINS = ["https://domanitiinterrogo.online/*"]
+CSRF_TRUSTED_ORIGINS = ["https://domanitiinterrogo.website/*"]
 
 ROOT_URLCONF = 'domanitiinterrogo.urls'
 
