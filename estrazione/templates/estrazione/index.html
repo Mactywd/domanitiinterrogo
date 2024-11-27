@@ -98,37 +98,21 @@
 		<nav>
 			<img src="https://i.imgur.com/GOYwxYO.png" alt="logo" />
 			<!-- <a href="."><img src="https://i.imgur.com/lJKFrz5.png" alt="Interrogazioni"></a> -->
-			<a href=".">Interrogazioni</a>
+			<a href="/">Interrogazioni</a>
 		</nav>
 		
 		<main>
+			{% for estrazione in estrazioni %}
 			<div class="estrazione">
-				<a href="./2">
-					<p class="title">Estrazione Inglese</p>
+				<a href="">
+					<p class="title"></p>
 					<p class="data">
-						del <span class="date">6/01/2024</span> alle
-						<span class="time">18:27</span>
+						del <span class="date"></span> alle
+						<span class="time"></span>
 					</p>
 				</a>
 			</div>
-			<div class="estrazione">
-				<a href="./1">
-					<p class="title">Cavie per Francesca</p>
-					<p class="data">
-						del <span class="date">3/12/2024</span> alle
-						<span class="time">15:07</span>
-					</p>
-				</a>
-			</div>
-			<div class="estrazione">
-				<a href="./0">
-					<p class="title">Volontari Arte</p>
-					<p class="data">
-						del <span class="date">19/11/2024</span> alle
-						<span class="time">19:46</span>
-					</p>
-				</a>
-			</div>
+			{% endfor %}
 		</main>
 
 		<!-- NEW EXTRACTION -->
@@ -145,6 +129,26 @@
 			$("#add-button").on("click", function () {
 				window.location.href = "./nuova";
 			});
+
+			$(document).ready(function() {
+				date = {{date|safe}}
+				estratti = {{estratti|safe}}
+				selected_names = {{selected_names|safe}}
+				title = {{title|safe}}
+				estrazioni = {{estrazioni|safe}}
+				
+				$(".estrazione").each(function(index) {
+					raw_date = estrazioni[index].date
+					parsed_date = raw_date.split("/")[0]
+					parsed_time = raw_date.split("/")[1]
+
+					$(this).children("a").children(".title").text(estrazioni[index].title);
+					$(this).children("a").children(".data").children(".date").text(parsed_date);
+					$(this).children("a").children(".data").children(".time").text(parsed_time);
+					$(this).children("a").attr("href", "./dettagli/" + (date.length - (index + 1)));
+				})
+				
+			})
 		</script>
 	</body>
 </html>

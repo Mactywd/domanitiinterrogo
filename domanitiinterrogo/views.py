@@ -3,8 +3,7 @@ from django.shortcuts import redirect
 
 # Create your views here.
 def index(request):
-    return redirect('/interrogazioni/')    
-    # return render(request, 'domanitiinterrogo/index.html')
+    return render(request, 'domanitiinterrogo/index.html')
 
 def manage(request):
     return render(request, 'domanitiinterrogo/manage.html')

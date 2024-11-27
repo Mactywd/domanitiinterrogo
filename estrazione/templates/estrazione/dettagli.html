@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<title>Estrazione</title>
+		<style>
+			/* NAVBAR */
+			body {
+				margin: 0;
+				padding: 0;
+				background-color: #f1f1f1;
+			}
+
+			nav {
+				background-color: #fff;
+				height: 60px;
+				display: flex;
+				justify-content: flex-start;
+				align-items: center;
+			}
+			nav a {
+				text-decoration: none;
+				color: #4ea5d1;
+				font-weight: bold;
+				font-size: 20px;
+				margin-left: 20px;
+			}
+
+			img {
+				height: 40px;
+				margin-left: 20px;
+			}
+
+			/* MAIN */
+			h1 {
+				text-align: center;
+				color: #2085b8;
+			}
+
+			main {
+				margin: 0 2em;
+			}
+			h3 {
+				color: #2085b8;
+			}
+
+			/* persone estraibili */
+			.lista-estraibili ul {
+				list-style-type: none;
+				display: grid;
+				padding: 0;
+				grid-template-columns: repeat(auto-fit, minmax(calc(100% / 2), 1fr));
+			}
+			.lista-estraibili li {
+				margin-bottom: 0.5em;
+				padding: 10px;
+				margin: 3px;
+				text-align: center;
+				border-radius: 10px;
+				color: white;
+				user-select: none;
+			}
+
+			.selected {
+				background-color: #4ea5d1;
+			}
+			.unselected {
+				background-color: #4a6877;
+			}
+
+			/* Numero estratti */
+			.quantita {
+				display: flex;
+                margin-top: 3em;
+			}
+            .quantita h3 {
+                margin-bottom: 0;
+            }
+
+			/* Bottoni */
+			.buttons {
+				display: flex;
+				justify-content: space-between;
+				margin-top: 3em;
+				margin-bottom: 4em;
+			}
+			#back,
+			#condividi {
+				background-color: #4ea5d1;
+				color: white;
+				border: none;
+				padding: 15px 32px;
+				text-align: center;
+				text-decoration: none;
+				display: inline-block;
+				font-size: 16px;
+				cursor: pointer;
+				border-radius: 10px;
+			}
+			#back:active,
+			#condividi:active {
+				background-color: #35708d;
+			}
+
+			/* ESTRATTI OL */
+
+			ol {
+				counter-reset: li; /* Initiate a counter */
+				list-style: none; /* Remove default numbering */
+				padding: 0;
+				margin-bottom: 4em;
+                width: 70%;
+                margin: 2em auto;
+			}
+
+			ol li {
+				position: relative;
+				display: block;
+				padding: 0.4em 0.4em 0.4em 0.8em;
+				margin: 0.5em 0 0.5em 2.5em;
+				background: #4ea5d1;
+				color: white;
+			}
+
+			ol li:before {
+				content: counter(li);
+				counter-increment: li;
+				position: absolute;
+				left: -2.5em;
+				top: 50%;
+				margin-top: -1em;
+				background: #35708d;
+				height: 2em;
+				width: 2em;
+				line-height: 2em;
+				text-align: center;
+				font-weight: bold;
+			}
+			ol li:after {
+				position: absolute;
+				content: "";
+				border: 0.5em solid transparent;
+				left: -1em;
+				top: 50%;
+				margin-top: -0.5em;
+			}
+		</style>
+	</head>
+	<body>
+		<nav>
+			<img src="https://i.imgur.com/GOYwxYO.png" alt="logo" />
+			<!-- <a href="."><img src="https://i.imgur.com/lJKFrz5.png" alt="Interrogazioni"></a> -->
+			<a href="/">Interrogazioni</a>
+		</nav>
+
+		<h1>{{title}}</h1>
+
+		<main>
+			<div class="lista-estraibili">
+				<h3>Persone estraibili:</h3>
+				<ul>
+					<!-- "Armini", "Bucci", "Canne", "Cauceglia", "Cennini", "Faggioli", "Fe", "Girellini", "Lenti", "Lorenzoni", "Maione", "Montesi", "Niglio", "Polino", "Resuli", "Siebetcheu" -->
+					<li>Armini</li>
+					<li>Bucci</li>
+					<li>Canne</li>
+					<li>Cauceglia</li>
+					<li>Cennini</li>
+					<li>Faggioli</li>
+					<li>Fe</li>
+					<li>Girellini</li>
+					<li>Lenti</li>
+					<li>Lorenzoni</li>
+					<li>Maione</li>
+					<li>Montesi</li>
+					<li>Niglio</li>
+					<li>Polino</li>
+					<li>Resuli</li>
+					<li>Siebetcheu</li>
+				</ul>
+			</div>
+			<div class="quantita">
+				<h3>Persone estratte:</h3>
+			</div>
+			<ol class="estratti">
+                {% for estratto in estratti %}
+				<li>{{estratto}}</li>
+				{% endfor %}
+			</ol>
+
+			<div class="buttons">
+				<button id="back">Indietro</button>
+				<a id="condividi" href="" data-action="share/whatsapp/share"
+					>Condividi</a
+				>
+			</div>
+		</main>
+
+		<script
+			src="https://code.jquery.com/jquery-3.6.0.min.js"
+			integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4="
+			crossorigin="anonymous"
+		></script>
+		<script>
+			$(document).ready(function () {
+				$("ul li").each(function () {
+                    if ({{selected_names|safe}}.includes($(this).text())) {
+                        $(this).addClass("selected");
+                    } else {
+                        $(this).addClass("unselected");
+                    }
+				});
+                
+                $("#back").on("click", function () {
+                    window.location.href = "/estrazione";
+				});
+
+				$("#condividi").attr(
+					"href",
+					"whatsapp://send?text=" + encodeURIComponent(window.location.href)
+				);
+			});
+		</script>
+	</body>
+</html>

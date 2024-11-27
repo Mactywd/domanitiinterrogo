@@ -133,7 +133,7 @@
 		<nav>
 			<img src="https://i.imgur.com/GOYwxYO.png" alt="logo" />
 			<!-- <a href="."><img src="https://i.imgur.com/lJKFrz5.png" alt="Interrogazioni"></a> -->
-			<a href=".">Interrogazioni</a>
+			<a href="/">Interrogazioni</a>
 		</nav>
 
 		<h1>Nuova Estrazione</h1>
@@ -195,15 +195,19 @@
 			        if ($(this).hasClass("selected")) {
 			            $(this).removeClass("selected")
 			            $(this).addClass("unselected")
+
+						$("#slider").attr("max", parseInt($("#slider").attr("max")) - 1);
 			        } else {
 			            $(this).removeClass("unselected")
 			            $(this).addClass("selected")
+
+						$("#slider").attr("max", parseInt($("#slider").attr("max")) + 1);
 			        }
 			    })
 
 
 			    $("#back").on("click", function() {
-			        window.history.back()
+			        window.location.href = "/estrazione"
 			    })
 
 			    $("#estrai").on("click", function() {
@@ -220,8 +224,11 @@
                     console.log(title, selected_names, quantita)
 
 			        $.ajax({
-			            url: "/estrazione/creanuova",
+			            url: "/estrazione/crea_nuova",
 			            type: "POST",
+			            headers: {
+			                'X-CSRFToken': '{{ csrf_token }}'
+			            },
 			            data: {
 			                "title": title,
 			                "selected_names": selected_names,
@@ -229,6 +236,7 @@
 			            },
 			            success: function(data) {
 			                console.log(data)
+							window.location.href = "/estrazione"
 			            }
 			        })
                 })
