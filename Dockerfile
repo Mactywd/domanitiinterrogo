@@ -7,7 +7,7 @@ RUN pip install --no-cache-dir -r requirements.txt
 
 RUN mkdir -p static media
 
-RUN puthon manage.py collectstatic --noinput
+RUN python manage.py collectstatic --noinput
 
 COPY . .
 
