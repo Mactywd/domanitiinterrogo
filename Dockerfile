@@ -6,10 +6,9 @@ COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
 RUN mkdir -p static media
+COPY . .
 
 RUN python manage.py collectstatic --noinput
-
-COPY . .
 
 EXPOSE 8000
 
