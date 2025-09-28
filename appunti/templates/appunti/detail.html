@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+
+{% block title %}{{ appunto.titolo }}{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <h1 class="mb-3">{{ appunto.titolo }}</h1>
+    <p class="text-muted">
+        {{ appunto.materia.nome }} — {{ appunto.data|date:"j F Y" }}
+    </p>
+    <hr>
+    <div class="markdown-body mb-4">
+        {{ contenuto_html|safe }}
+    </div>
+</div>
+{% endblock %}

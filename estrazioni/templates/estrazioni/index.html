@@ -1,0 +1,160 @@
+{% extends "base.html" %}
+
+{% block title %}Estrazioni{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2 class="mb-4">Elenco Estrazioni</h2>
+
+    <!-- Lista estrazioni -->
+    <div class="list-group">
+        {% for estrazione in estrazioni %}
+        <a href="#" 
+           class="list-group-item list-group-item-action" 
+           data-bs-toggle="modal" 
+           data-bs-target="#dettagliEstrazioneModal{{ estrazione.id }}">
+            <div class="d-flex justify-content-between">
+                <strong>{{ estrazione.titolo }}</strong>
+                <small>{{ estrazione.data|date:"d/m/Y H:i" }}</small>
+            </div>
+        </a>
+
+        <!-- Modal dettagli estrazione -->
+        <!-- Modal dettagli estrazione -->
+<div class="modal fade" id="dettagliEstrazioneModal{{ estrazione.id }}" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">{{ estrazione.titolo }}</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Chiudi"></button>
+      </div>
+      <div class="modal-body">
+        <p><strong>Data:</strong> {{ estrazione.data|date:"d/m/Y H:i" }}</p>
+
+        <h6>Studenti</h6>
+        <div class="row mb-3">
+          {% for studente in studenti %}
+          <div class="col-6 mb-2">
+            {% if studente in estrazione.studenti_estraibili.all %}
+              <div class="p-2 border rounded bg-secondary text-white text-center">
+                {{ studente.cognome }}
+              </div>
+            {% else %}
+              <div class="p-2 border rounded bg-light text-center">
+                {{ studente.cognome }}
+              </div>
+            {% endif %}
+          </div>
+          {% endfor %}
+        </div>
+
+        <h6>Studenti estratti</h6>
+        <ol>
+          {% for studente in estrazione.studenti_estratti.all %}
+            <li><b>{{ studente.cognome }}</b></li>
+          {% empty %}
+            <li><em>Nessuno estratto</em></li>
+          {% endfor %}
+        </ol>
+      </div>
+    </div>
+  </div>
+</div>
+
+        {% empty %}
+        <p class="text-muted">Nessuna estrazione presente.</p>
+        {% endfor %}
+    </div>
+</div>
+
+<!-- Floating Button -->
+<button type="button" 
+        class="btn btn-primary rounded-circle position-fixed" 
+        style="bottom: 20px; right: 20px; width: 60px; height: 60px; font-size: 24px;" 
+        data-bs-toggle="modal" 
+        data-bs-target="#nuovaEstrazioneModal">
+    +
+</button>
+
+<!-- Modal nuova estrazione -->
+<div class="modal fade" id="nuovaEstrazioneModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <form method="post" action="{% url 'estrazioni:crea' %}">
+        {% csrf_token %}
+        <div class="modal-header">
+          <h5 class="modal-title">Nuova Estrazione</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Chiudi"></button>
+        </div>
+        <div class="modal-body">
+          <!-- Titolo -->
+          <div class="mb-3">
+            <label for="titolo" class="form-label">Titolo</label>
+            <input type="text" class="form-control" id="titolo" name="titolo" required>
+          </div>
+
+          <!-- Griglia studenti -->
+          <div class="mb-3">
+            <label class="form-label">Studenti</label>
+            <div class="row">
+              {% for studente in studenti %}
+              <div class="col-6 mb-2">
+                <input class="btn-check studente-check" type="checkbox" 
+                       name="studenti" value="{{ studente.id }}" 
+                       id="studente{{ studente.id }}" checked>
+                <label class="btn btn-outline-primary w-100" for="studente{{ studente.id }}">
+                  {{ studente.cognome }}
+                </label>
+              </div>
+              {% endfor %}
+            </div>
+          </div>
+
+          <!-- Slider numero estratti -->
+          <div class="mb-3">
+            <label for="num_estratti" class="form-label">Numero studenti da estrarre</label>
+            <input type="range" class="form-range" min="1" max="{{ studenti.count }}" 
+                   value="1" id="num_estratti" name="num_estratti">
+            <p>Selezionati: <span id="sliderValue">1</span></p>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="submit" class="btn btn-success">Crea Estrazione</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block script %}
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+  const slider = document.getElementById("num_estratti");
+  const sliderValue = document.getElementById("sliderValue");
+  const checkboxes = document.querySelectorAll(".studente-check");
+
+  function updateSlider() {
+    const selected = Array.from(checkboxes).filter(cb => cb.checked).length;
+    slider.max = selected > 0 ? selected : 1;
+    if (parseInt(slider.value) > selected) {
+      slider.value = selected;
+    }
+    sliderValue.innerText = slider.value;
+  }
+
+  // aggiorna valore visualizzato
+  slider.addEventListener("input", () => {
+    sliderValue.innerText = slider.value;
+  });
+
+  // aggiorna slider quando cambio selezione studenti
+  checkboxes.forEach(cb => {
+    cb.addEventListener("change", updateSlider);
+  });
+
+  // inizializza
+  updateSlider();
+});
+</script>
+{% endblock %}

@@ -1,0 +1,162 @@
+{% extends "base.html" %}
+
+{% block title %}{{ materia.nome }}{% endblock %}
+
+{% block style %}
+<style>
+	table {
+		width: 100%;
+		border-collapse: collapse;
+	}
+
+	thead {
+		background-color: #007bff;
+		color: white;
+	}
+
+	tbody tr:nth-child(odd) {
+		background-color: #f8f9fa;
+	}
+
+	tbody tr:nth-child(even) {
+		background-color: #ffffff;
+	}
+
+	td,
+	th {
+		padding: 12px;
+		vertical-align: middle;
+		border-top: 1px solid #dee2e6;
+	}
+
+	th {
+		border-bottom: 2px solid #dee2e6;
+	}
+
+	.col-nome {
+		width: 50%;
+	}
+
+	.col-data {
+		width: 20%;
+	}
+
+	.col-volte {
+		width: 15%;
+	}
+
+	.col-azione {
+		width: 15%;
+		text-align: center;
+	}
+
+	.sticky-footer {
+		position: sticky;
+		bottom: 0;
+		background-color: #fff;
+		z-index: 1020;
+		/* sopra ai contenuti */
+	}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid mt-4">
+
+	<table class="table">
+		<h1><b>{{ materia.nome }}</b></h1>
+		<thead>
+			<tr>
+				<th class="col-nome">Nome</th>
+				<th class="col-data">Data</th>
+				<th class="col-volte">Volte</th>
+				<th class="col-azione">Azione</th>
+			</tr>
+		</thead>
+		<tbody>
+			{% for entry in studenti_data %}
+			<tr>
+				<td><strong>{{ entry.studente.cognome }}</strong></td>
+				<td>
+					{% if entry.ultima %}
+					<span class="text-success">{{ entry.ultima|date:"d M" }}</span>
+					{% else %}
+					<span class="text-danger">mai</span>
+					{% endif %}
+				</td>
+				<td>{{ entry.count }}</td>
+				<td>
+					<button class="btn btn-primary btn-sm" data-bs-toggle="modal"
+						data-bs-target="#studenteModal{{ entry.studente.id }}">
+						Aggiorna
+					</button>
+				</td>
+			</tr>
+
+			<!-- Modale per studente -->
+			<div class="modal fade" id="studenteModal{{ entry.studente.id }}" tabindex="-1" aria-hidden="true">
+				<div class="modal-dialog modal-lg modal-dialog-centered">
+					<div class="modal-content">
+						<div class="modal-header">
+							<h5 class="modal-title">Aggiorna interrogazioni</h5>
+							<button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+						</div>
+
+						<div class="modal-body">
+							<!-- FORM per aggiungere interrogazione -->
+							<form id="form-add-{{ entry.studente.id }}" method="post" action="">
+								{% csrf_token %}
+								<input type="hidden" name="studente_id" value="{{ entry.studente.id }}">
+								<input type="hidden" name="materia_id" value="{{ materia.id }}">
+
+								<div class="mb-3">
+									<label class="form-label"><strong>Studente</strong></label>
+									<input type="text" class="form-control" value="{{ entry.studente.cognome }}"
+										readonly>
+								</div>
+								<div class="mb-3">
+									<label class="form-label"><strong>Nuova data interrogazione</strong></label>
+									<input type="date" name="data" class="form-control" required>
+								</div>
+							</form>
+
+							<hr>
+							<h6>Storico interrogazioni</h6>
+							<ul>
+								{% for interrogazione in entry.studente.interrogazioni.all|dictsort:"data" %}
+								{% if interrogazione.materia.id == materia.id %}
+								<li>
+									{{ interrogazione.data|date:"d M Y" }}
+									<!-- FORM separato per rimuovere -->
+									<form method="post" action="" style="display:inline;">
+										{% csrf_token %}
+										<input type="hidden" name="studente_id" value="{{ entry.studente.id }}">
+										<input type="hidden" name="materia_id" value="{{ materia.id }}">
+										<input type="hidden" name="remove_id" value="{{ interrogazione.id }}">
+										<button type="submit"
+											class="btn btn-link text-danger btn-sm p-0">rimuovi</button>
+									</form>
+								</li>
+								{% endif %}
+								{% empty %}
+								<li>Nessuna interrogazione registrata.</li>
+								{% endfor %}
+							</ul>
+						</div>
+
+						<!-- FOOTER SEMPRE IN FONDO -->
+						<div class="modal-footer">
+							<button type="submit" class="btn btn-success" form="form-add-{{ entry.studente.id }}">
+								Aggiungi
+							</button>
+							<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Chiudi</button>
+						</div>
+					</div>
+				</div>
+			</div>
+
+			{% endfor %}
+		</tbody>
+	</table>
+</div>
+{% endblock %}

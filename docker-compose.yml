@@ -1,0 +1,30 @@
+version: '3.8'
+
+services:
+  app:
+    build: .
+    container_name: domanitiinterrogo
+    restart: unless-stopped
+    volumes:
+      # Mount the database file to ensure persistence
+      - ./db.sqlite3:/app/db.sqlite3
+      # Mount static files directory
+      - ./static:/app/static
+      # Mount media files directory (if you have user uploads)
+      - ./media:/app/media
+    environment:
+      - DJANGO_ENV=production
+      - PYTHONUNBUFFERED=1
+      - DEBUG=False
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.domanitiinterrogo.rule=Host(`domanitiinterrogo.mattiagirellini.com`)"
+      - "traefik.http.routers.domanitiinterrogo.tls=true"
+      - "traefik.http.routers.domanitiinterrogo.tls.certresolver=letsencrypt"
+      - "traefik.http.services.domanitiinterrogo.loadbalancer.server.port=8000"
+    networks:
+      - web
+
+networks:
+  web:
+    external: true

@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+
+{% block title %}Interrogazioni{% endblock %}
+
+{% block content %}
+<div class="container text-center mt-5">
+    <h1 class="mb-4">Interrogazioni</h1>
+    <p class="lead mb-5">Seleziona una materia:</p>
+
+    <div class="row g-3 justify-content-center">
+        {% for materia in materie %}
+            <div class="col-12 col-md-4 d-grid">
+                <a href="{% url 'interrogazioni:materia_detail' materia.id %}" 
+                   class="btn btn-secondary btn-lg">
+                    {{ materia.nome }}
+                </a>
+            </div>
+        {% empty %}
+            <p>Nessuna materia trovata.</p>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}
