@@ -50,7 +50,7 @@
 
         <h6>Studenti estratti</h6>
         <ol>
-          {% for studente in estrazione.studenti_estratti.all %}
+          {% for studente in estrazione.get_studenti_estratti_in_ordine %}
             <li><b>{{ studente.cognome }}</b></li>
           {% empty %}
             <li><em>Nessuno estratto</em></li>

@@ -29,7 +29,7 @@ SECRET_KEY = 'django-insecure-hj%mi#q(rzphgx=gme2!jaj(!b*^w+^_%wx30^sbt3*-f=on(0
 DEBUG = environment == 'development'
 
 ALLOWED_HOSTS = ["*"] if DEBUG else ['domanitiinterrogo.mattiagirellini.com']
-CSRF_TRUSTED_ORIGINS = ['domanitiinterrogo.mattiagirellini.com']
+CSRF_TRUSTED_ORIGINS = ['https://domanitiinterrogo.mattiagirellini.com']
 
 
 # Application definition

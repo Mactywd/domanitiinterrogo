@@ -1,11 +1,13 @@
 from django.shortcuts import render, redirect
 from .models import Estrazione
 from interrogazioni.models import Studente, Materia
-import random
+import random, json
 
 def index(request):
     estrazioni = Estrazione.objects.all().order_by("-data")
     studenti = Studente.objects.all()
+    # render students in alphabetical order
+    studenti = studenti.order_by("cognome")
     return render(request, "estrazioni/index.html", {"estrazioni": estrazioni, "studenti": studenti})
 
 def crea_estrazione(request):
@@ -18,9 +20,14 @@ def crea_estrazione(request):
         estrazione = Estrazione.objects.create(titolo=titolo)
         estrazione.studenti_estraibili.set(studenti_estraibili)
 
-        # estrazione casuale
+        # random draw and preserve order
         estratti = random.sample(list(studenti_estraibili), num_estratti)
-        estrazione.studenti_estratti.set(estratti)
+        random.shuffle(estratti)
 
+        estrazione.studenti_estratti.set(estratti)
+        estrazione.ordine_estratti = json.dumps([s.id for s in estratti])
         estrazione.save()
+
         return redirect("estrazioni:index")
+
+

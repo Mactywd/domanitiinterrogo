@@ -4,10 +4,16 @@
 
 {% block content %}
 <div class="container text-center mt-5">
-    <h1 class="mb-4">Benvenuto nella 5L</h1>
-    <p class="lead mb-5">Scegli un'applicazione per iniziare:</p>
+    <h1 class="mb-4">Sito della 5L</h1>
 
-    <div class="row g-3 justify-content-center">
+    <!-- Clickable MOTD -->
+    <p class="lead mb-5">
+        <a href="#" class="text-decoration-none text-dark" data-bs-toggle="modal" data-bs-target="#motdModal">
+            {{ motd.text }}
+        </a>
+    </p>
+
+    <div class="row g-3 justify-content-center mb-5">
         <div class="col-12 col-md-4 d-grid">
             <a href="{% url 'interrogazioni:index' %}" class="btn btn-secondary btn-lg">
                 Interrogazioni
@@ -22,6 +28,28 @@
             <a href="{% url 'appunti:index' %}" class="btn btn-secondary btn-lg">
                 Appunti
             </a>
+        </div>
+    </div>
+</div>
+
+<!-- Modal -->
+<div class="modal fade" id="motdModal" tabindex="-1" aria-labelledby="motdModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <form method="post" action=".">
+                {% csrf_token %}
+                <div class="modal-header">
+                    <h5 class="modal-title" id="motdModalLabel">Aggiungi MOTD</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <textarea name="motd_text" class="form-control" rows="4" placeholder="Scrivi qui..."></textarea>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annulla</button>
+                    <button type="submit" class="btn btn-primary">Salva</button>
+                </div>
+            </form>
         </div>
     </div>
 </div>
