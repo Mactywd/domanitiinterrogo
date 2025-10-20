@@ -28,8 +28,8 @@ SECRET_KEY = 'django-insecure-hj%mi#q(rzphgx=gme2!jaj(!b*^w+^_%wx30^sbt3*-f=on(0
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = environment == 'development'
 
-ALLOWED_HOSTS = ["*"] if DEBUG else ['domanitinterrogo.mattiagirellini.com']
-CSRF_TRUSTED_ORIGINS = ['domanitinterrogo.mattiagirellini.com']
+ALLOWED_HOSTS = ["*"] if DEBUG else ['domanitiinterrogo.mattiagirellini.com']
+CSRF_TRUSTED_ORIGINS = ['domanitiinterrogo.mattiagirellini.com']
 
 
 # Application definition
