@@ -13,7 +13,7 @@ https://docs.djangoproject.com/en/4.2/ref/settings/
 from pathlib import Path
 import os
 
-environment = os.getenv('DJANGO_ENVIRONMENT', 'development')
+environment = os.getenv('DJANGO_ENV', 'development')
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -29,7 +29,7 @@ SECRET_KEY = 'django-insecure-hj%mi#q(rzphgx=gme2!jaj(!b*^w+^_%wx30^sbt3*-f=on(0
 DEBUG = environment == 'development'
 
 ALLOWED_HOSTS = ["*"] if DEBUG else ['domanitinterrogo.mattiagirellini.com']
-CSRF_TRUSTED_ORIGINS = ['https://domanitinterrogo.mattiagirellini.com']
+CSRF_TRUSTED_ORIGINS = ['domanitinterrogo.mattiagirellini.com']
 
 
 # Application definition
