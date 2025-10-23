@@ -16,7 +16,7 @@ services:
       - DEBUG=False
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.domanitiinterrogo.rule=Host(`domanitiinterrogo.mattiagirellini.com`)"
+      - "traefik.http.routers.domanitiinterrogo.rule=Host(`domanitiinterrogo.mattiagirellini.com`) || Host(`domanitiinterrogo.site`)"
       - "traefik.http.routers.domanitiinterrogo.tls=true"
       - "traefik.http.routers.domanitiinterrogo.tls.certresolver=letsencrypt"
       - "traefik.http.services.domanitiinterrogo.loadbalancer.server.port=8000"

@@ -18,11 +18,14 @@ def materia_detail(request, materia_id):
         data_str = request.POST.get("data")
         remove_id = request.POST.get("remove_id")
 
+        print(f"{studente_id=}, {data_str=}, {remove_id=}")
+        
+        if remove_id:
+            interrogazione = get_object_or_404(Interrogazione, pk=remove_id)
+            interrogazione.delete()
+            return redirect("interrogazioni:materia_detail", materia_id=materia.id)
+
         if studente_id and data_str:
-            if remove_id:
-                interrogazione = get_object_or_404(Interrogazione, pk=remove_id)
-                interrogazione.delete()
-                return redirect("interrogazioni:materia_detail", materia_id=materia.id)
             
             studente = get_object_or_404(Studente, pk=studente_id)
             data = parse_date(data_str)
