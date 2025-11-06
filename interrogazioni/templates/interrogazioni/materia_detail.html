@@ -79,7 +79,11 @@
 				<td><strong>{{ entry.studente.cognome }}</strong></td>
 				<td>
 					{% if entry.ultima %}
-					<span class="text-success">{{ entry.ultima|date:"d M" }}</span>
+						{% if entry.is_orange %}
+						<span class="text-warning">{{ entry.ultima|date:"d M" }}</span>
+						{% else %}
+						<span class="text-success">{{ entry.ultima|date:"d M" }}</span>
+						{% endif %}
 					{% else %}
 					<span class="text-danger">mai</span>
 					{% endif %}

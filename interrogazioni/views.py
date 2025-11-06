@@ -58,6 +58,32 @@ def materia_detail(request, materia_id):
             "ultima": ultima
         })
 
+    # Calculate orange/green status for each student
+    total_students = len(studenti_data)
+
+    for entry in studenti_data:
+        # Skip if never interrogated (will show red "mai")
+        if entry["count"] == 0:
+            entry["is_orange"] = False
+            continue
+
+        # Priority 1: If 30%+ have fewer grades than me → GREEN (safe)
+        students_with_fewer = sum(1 for e in studenti_data if e["count"] < entry["count"])
+        if students_with_fewer >= total_students * 0.3:
+            entry["is_orange"] = False
+            continue
+
+        # Priority 2: If 60%+ interrogated after me → ORANGE (behind)
+        if entry["ultima"]:
+            students_after = sum(1 for e in studenti_data
+                               if e["ultima"] and e["ultima"] > entry["ultima"])
+            if students_after >= total_students * 0.6:
+                entry["is_orange"] = True
+                continue
+
+        # Default: GREEN
+        entry["is_orange"] = False
+
     return render(request, "interrogazioni/materia_detail.html", {
         "materia": materia,
         "studenti_data": studenti_data
