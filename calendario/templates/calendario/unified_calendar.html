@@ -20,10 +20,9 @@
                 {% for evento in eventi_list %}
                 <div class="list-group-item">
                     <div class="d-flex justify-content-between align-items-center">
-                        <div>
-                            <strong>{{ evento.studente.cognome }}</strong>
-                            <span class="mx-2">-</span>
-                            <span class="badge bg-info">{{ evento.materia.nome }}</span>
+                        <div class="d-flex flex-column">
+                            <strong class="text-center">{{ evento.studente.cognome }}</strong>
+                            <span class="badge bg-info mt-1">{{ evento.materia.nome }}</span>
                         </div>
                         <a href="{% url 'calendario:materia_calendar' evento.materia.id %}"
                            class="btn btn-sm btn-outline-primary">
