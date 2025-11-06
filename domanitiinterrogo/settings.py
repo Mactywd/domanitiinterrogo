@@ -45,6 +45,7 @@ INSTALLED_APPS = [
     'estrazioni',
     'appunti',
     'home',
+    'calendario',
 ]
 
 MIDDLEWARE = [
@@ -68,6 +69,7 @@ TEMPLATES = [
             BASE_DIR / "estrazioni" / "templates",
             BASE_DIR / "appunti" / "templates",
             BASE_DIR / "home" / "templates",
+            BASE_DIR / "calendario" / "templates",
         ],
         'APP_DIRS': True,
         'OPTIONS': {

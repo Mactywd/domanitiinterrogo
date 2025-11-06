@@ -1,0 +1,47 @@
+{% extends "base.html" %}
+
+{% block title %}Vista Unificata Calendari{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="d-flex flex-column flex-sm-row justify-content-between align-items-start align-items-sm-center mb-4 gap-3">
+        <h2 class="mb-0">Vista Unificata - Tutte le Interrogazioni</h2>
+        <a href="{% url 'calendario:index' %}" class="btn btn-secondary">Indietro</a>
+    </div>
+
+    <!-- Eventi raggruppati per data -->
+    {% for data_str, eventi_list in eventi_grouped %}
+    <div class="card mb-3">
+        <div class="card-header bg-primary text-white">
+            <h5 class="mb-0">{{ eventi_list.0.data|date:"l d F Y" }}</h5>
+        </div>
+        <div class="card-body">
+            <div class="list-group list-group-flush">
+                {% for evento in eventi_list %}
+                <div class="list-group-item">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <strong>{{ evento.studente.cognome }}</strong>
+                            <span class="mx-2">-</span>
+                            <span class="badge bg-info">{{ evento.materia.nome }}</span>
+                        </div>
+                        <a href="{% url 'calendario:materia_calendar' evento.materia.id %}"
+                           class="btn btn-sm btn-outline-primary">
+                            Vai al calendario
+                        </a>
+                    </div>
+                    {% if evento.note %}
+                    <small class="text-muted d-block mt-2">{{ evento.note }}</small>
+                    {% endif %}
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+    {% empty %}
+    <div class="alert alert-info">
+        Nessuna interrogazione programmata.
+    </div>
+    {% endfor %}
+</div>
+{% endblock %}

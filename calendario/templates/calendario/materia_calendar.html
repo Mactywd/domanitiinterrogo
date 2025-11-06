@@ -1,0 +1,354 @@
+{% extends "base.html" %}
+
+{% block title %}Calendario {{ materia.nome }}{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="d-flex flex-column flex-sm-row justify-content-between align-items-start align-items-sm-center mb-4 gap-3">
+        <h2 class="mb-0">Calendario: {{ materia.nome }}</h2>
+        <div class="d-flex flex-wrap gap-2">
+            <a href="{% url 'calendario:index' %}" class="btn btn-secondary">Indietro</a>
+            <a href="{% url 'calendario:unified_calendar' %}" class="btn btn-primary">Vista Unificata</a>
+        </div>
+    </div>
+
+    <!-- Eventi programmati -->
+    <div class="list-group mb-4">
+        {% for evento in eventi %}
+        <div class="list-group-item">
+            <div class="d-flex justify-content-between align-items-start">
+                <div class="flex-grow-1" style="cursor: pointer;" data-bs-toggle="collapse" data-bs-target="#evento{{ evento.id }}">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <strong>{{ evento.studente.cognome }}</strong>
+                        <span class="badge bg-info">{{ evento.data|date:"d/m/Y" }}</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Dettagli evento (collapsible) -->
+            <div class="collapse mt-3" id="evento{{ evento.id }}">
+                <div class="card card-body">
+                    <p><strong>Data:</strong> {{ evento.data|date:"d/m/Y" }}</p>
+                    {% if evento.note %}
+                    <p><strong>Note:</strong> {{ evento.note }}</p>
+                    {% endif %}
+
+                    <!-- User controls (available to everyone) -->
+                    <div class="d-flex flex-wrap gap-2 mb-3">
+                        <button type="button" class="btn btn-sm btn-outline-info"
+                                data-bs-toggle="modal"
+                                data-bs-target="#editNoteModal{{ evento.id }}">
+                            Modifica Note
+                        </button>
+                    </div>
+
+                    <!-- Admin-only controls -->
+                    {% if user.is_staff %}
+                    <hr>
+                    <div class="d-flex flex-wrap gap-2">
+                        <!-- Shift buttons -->
+                        <form method="post" action="{% url 'calendario:shift_up' materia.id evento.id %}" class="d-inline">
+                            {% csrf_token %}
+                            <button type="submit" class="btn btn-sm btn-outline-primary">↑ Sposta su</button>
+                        </form>
+
+                        <form method="post" action="{% url 'calendario:shift_down' materia.id evento.id %}" class="d-inline">
+                            {% csrf_token %}
+                            <button type="submit" class="btn btn-sm btn-outline-primary">↓ Sposta giù</button>
+                        </form>
+
+                        <!-- Edit button -->
+                        <button type="button" class="btn btn-sm btn-outline-warning"
+                                data-bs-toggle="modal"
+                                data-bs-target="#editModal{{ evento.id }}">
+                            Modifica
+                        </button>
+
+                        <!-- Delete button -->
+                        <form method="post" action="{% url 'calendario:delete_event' evento.id %}" class="d-inline">
+                            {% csrf_token %}
+                            <button type="submit" class="btn btn-sm btn-outline-danger"
+                                    onclick="return confirm('Sei sicuro di voler eliminare questa interrogazione programmata?')">
+                                Elimina
+                            </button>
+                        </form>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Edit Note Modal (available to everyone) -->
+        <div class="modal fade" id="editNoteModal{{ evento.id }}" tabindex="-1" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <form method="post" action="{% url 'calendario:update_note' evento.id %}">
+                        {% csrf_token %}
+                        <div class="modal-header">
+                            <h5 class="modal-title">Modifica Note</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                        </div>
+                        <div class="modal-body">
+                            <div class="mb-3">
+                                <label class="form-label">Studente</label>
+                                <input type="text" class="form-control" value="{{ evento.studente.cognome }}" disabled>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Data</label>
+                                <input type="text" class="form-control" value="{{ evento.data|date:'d/m/Y' }}" disabled>
+                            </div>
+                            <div class="mb-3">
+                                <label for="editNoteText{{ evento.id }}" class="form-label">Note</label>
+                                <textarea class="form-control" id="editNoteText{{ evento.id }}"
+                                          name="note" rows="3" placeholder="Aggiungi note...">{{ evento.note }}</textarea>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="submit" class="btn btn-primary">Salva</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- Edit Modal (admin only - can edit date and notes) -->
+        {% if user.is_staff %}
+        <div class="modal fade" id="editModal{{ evento.id }}" tabindex="-1" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <form method="post" action="{% url 'calendario:update_event' evento.id %}">
+                        {% csrf_token %}
+                        <div class="modal-header">
+                            <h5 class="modal-title">Modifica Interrogazione</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                        </div>
+                        <div class="modal-body">
+                            <div class="mb-3">
+                                <label class="form-label">Studente</label>
+                                <input type="text" class="form-control" value="{{ evento.studente.cognome }}" disabled>
+                            </div>
+                            <div class="mb-3">
+                                <label for="editData{{ evento.id }}" class="form-label">Data</label>
+                                <input type="date" class="form-control" id="editData{{ evento.id }}"
+                                       name="data" value="{{ evento.data|date:'Y-m-d' }}" required>
+                            </div>
+                            <div class="mb-3">
+                                <label for="editNote{{ evento.id }}" class="form-label">Note</label>
+                                <textarea class="form-control" id="editNote{{ evento.id }}"
+                                          name="note" rows="3">{{ evento.note }}</textarea>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="submit" class="btn btn-primary">Salva</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+
+        {% empty %}
+        <p class="text-muted">Nessuna interrogazione programmata per questa materia.</p>
+        {% endfor %}
+    </div>
+
+    <!-- Swap Modal -->
+    {% if user.is_staff and eventi|length > 1 %}
+    <div class="mb-3 d-flex flex-wrap gap-2">
+        <button type="button" class="btn btn-outline-info" data-bs-toggle="modal" data-bs-target="#swapModal">
+            Scambia date di due studenti
+        </button>
+        <button type="button" class="btn btn-outline-warning" data-bs-toggle="modal" data-bs-target="#bulkShiftModal">
+            Sposta tutte le interrogazioni
+        </button>
+    </div>
+
+    <div class="modal fade" id="swapModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <form method="post" action="{% url 'calendario:swap_students' materia.id %}">
+                    {% csrf_token %}
+                    <div class="modal-header">
+                        <h5 class="modal-title">Scambia Date</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="mb-3">
+                            <label for="evento1" class="form-label">Prima interrogazione</label>
+                            <select class="form-select" id="evento1" name="evento1_id" required>
+                                {% for evento in eventi %}
+                                <option value="{{ evento.id }}">
+                                    {{ evento.studente.cognome }} - {{ evento.data|date:"d/m/Y" }}
+                                </option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label for="evento2" class="form-label">Seconda interrogazione</label>
+                            <select class="form-select" id="evento2" name="evento2_id" required>
+                                {% for evento in eventi %}
+                                <option value="{{ evento.id }}">
+                                    {{ evento.studente.cognome }} - {{ evento.data|date:"d/m/Y" }}
+                                </option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="submit" class="btn btn-primary">Scambia</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bulk Shift Modal -->
+    <div class="modal fade" id="bulkShiftModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <form method="post" action="{% url 'calendario:bulk_shift_dates' materia.id %}" id="bulkShiftForm">
+                    {% csrf_token %}
+                    <div class="modal-header">
+                        <h5 class="modal-title">Sposta Interrogazioni in Blocco</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="mb-3">
+                            <label for="shiftDirection" class="form-label">Direzione</label>
+                            <select class="form-select" id="shiftDirection" name="direction" required onchange="toggleShiftMode()">
+                                <option value="">Seleziona...</option>
+                                <option value="forward">Avanti (salta una data)</option>
+                                <option value="backward">Indietro (aggiungi una nuova data)</option>
+                            </select>
+                            <div class="form-text">
+                                <strong>Avanti:</strong> Sposta tutte le interrogazioni in avanti quando una data deve essere saltata (es. lezione annullata).<br>
+                                <strong>Indietro:</strong> Riempi una nuova data disponibile spostando le interrogazioni successive indietro.
+                            </div>
+                        </div>
+
+                        <!-- Forward shift: select from existing dates -->
+                        <div class="mb-3" id="forwardDateContainer" style="display: none;">
+                            <label for="forwardStartDate" class="form-label">Data di inizio</label>
+                            <select class="form-select" id="forwardStartDate" name="start_date_forward">
+                                <option value="">Seleziona la data da cui iniziare...</option>
+                                {% for evento in eventi %}
+                                <option value="{{ evento.data|date:'Y-m-d' }}">
+                                    {{ evento.data|date:"d/m/Y" }} - {{ evento.studente.cognome }}
+                                </option>
+                                {% endfor %}
+                            </select>
+                            <div class="form-text">
+                                Tutte le interrogazioni a partire da questa data (inclusa) verranno spostate in avanti.
+                            </div>
+                        </div>
+
+                        <!-- Backward shift: enter new available date -->
+                        <div class="mb-3" id="backwardDateContainer" style="display: none;">
+                            <label for="backwardStartDate" class="form-label">Nuova data disponibile</label>
+                            <input type="date" class="form-control" id="backwardStartDate" name="start_date_backward">
+                            <div class="form-text">
+                                Inserisci la nuova data disponibile (es. 15/11). Tutte le interrogazioni successive si sposteranno indietro per riempire questa data.
+                                <br><strong>Esempio:</strong> Se hai interrogazioni il 20, 22, 25 e inserisci il 15, diventeranno: 15, 20, 22.
+                            </div>
+                        </div>
+
+                        <div class="mb-3" id="overflowDateContainer" style="display: none;">
+                            <label for="overflowDate" class="form-label">Data per l'ultima interrogazione</label>
+                            <input type="date" class="form-control" id="overflowDate" name="overflow_date">
+                            <div class="form-text">
+                                Specifica la nuova data per l'ultima interrogazione. Se lasciata vuota, verrà aggiunta automaticamente una settimana dopo.
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="submit" class="btn btn-warning" onclick="return confirm('Sei sicuro di voler spostare tutte le interrogazioni? Questa operazione non può essere annullata facilmente.')">
+                            Sposta
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function toggleShiftMode() {
+            const direction = document.getElementById('shiftDirection').value;
+            const forwardContainer = document.getElementById('forwardDateContainer');
+            const backwardContainer = document.getElementById('backwardDateContainer');
+            const overflowContainer = document.getElementById('overflowDateContainer');
+            const forwardSelect = document.getElementById('forwardStartDate');
+            const backwardInput = document.getElementById('backwardStartDate');
+
+            // Hide all and clear required attributes
+            forwardContainer.style.display = 'none';
+            backwardContainer.style.display = 'none';
+            overflowContainer.style.display = 'none';
+            forwardSelect.removeAttribute('required');
+            backwardInput.removeAttribute('required');
+
+            // Update the actual start_date field name based on direction
+            if (direction === 'forward') {
+                forwardContainer.style.display = 'block';
+                overflowContainer.style.display = 'block';
+                forwardSelect.setAttribute('required', 'required');
+                forwardSelect.setAttribute('name', 'start_date');
+                backwardInput.removeAttribute('name');
+            } else if (direction === 'backward') {
+                backwardContainer.style.display = 'block';
+                backwardInput.setAttribute('required', 'required');
+                backwardInput.setAttribute('name', 'start_date');
+                forwardSelect.removeAttribute('name');
+            }
+        }
+    </script>
+    {% endif %}
+</div>
+
+<!-- Floating Add Button (staff only) -->
+{% if user.is_staff %}
+<button type="button"
+        class="btn btn-primary rounded-circle position-fixed"
+        style="bottom: 20px; right: 20px; width: 60px; height: 60px; font-size: 24px;"
+        data-bs-toggle="modal"
+        data-bs-target="#addModal">
+    +
+</button>
+
+<!-- Add Modal -->
+<div class="modal fade" id="addModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <form method="post" action="{% url 'calendario:add_event' %}">
+                {% csrf_token %}
+                <input type="hidden" name="materia_id" value="{{ materia.id }}">
+                <div class="modal-header">
+                    <h5 class="modal-title">Aggiungi Interrogazione Programmata</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label for="studente" class="form-label">Studente</label>
+                        <select class="form-select" id="studente" name="studente_id" required>
+                            {% for studente in studenti %}
+                            <option value="{{ studente.id }}">{{ studente.cognome }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label for="data" class="form-label">Data</label>
+                        <input type="date" class="form-control" id="data" name="data" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="note" class="form-label">Note (opzionale)</label>
+                        <textarea class="form-control" id="note" name="note" rows="3"></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="submit" class="btn btn-success">Aggiungi</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endif %}
+{% endblock %}

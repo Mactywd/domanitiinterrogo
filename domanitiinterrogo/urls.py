@@ -6,5 +6,6 @@ urlpatterns = [
     path("interrogazioni/", include("interrogazioni.urls")),
     path("estrazioni/", include("estrazioni.urls")),
     path("appunti/", include("appunti.urls")),
+    path("calendario/", include("calendario.urls")),
     path("", include("home.urls")),
 ]
