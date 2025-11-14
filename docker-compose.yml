@@ -7,7 +7,7 @@ services:
       # Mount the database file to ensure persistence
       - ./db.sqlite3:/app/db.sqlite3
       # Mount static files directory
-      - ./static:/app/static
+      - ./staticfiles:/app/staticfiles
       # Mount media files directory (if you have user uploads)
       - ./media:/app/media
     environment:
